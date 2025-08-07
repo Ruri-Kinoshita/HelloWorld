@@ -11,9 +11,7 @@ import "package:firebase_core/firebase_core.dart";
 /// ```dart
 /// import 'firebase_options.dart';
 /// // ...
- await Firebase.initializeApp(
-   options: DefaultFirebaseOptions.currentPlatform,
- );
+ 
 /// ```
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {

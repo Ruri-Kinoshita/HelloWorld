@@ -1,6 +1,7 @@
+// 以下はebidenceのカラー例
+
 import 'dart:ui';
 
-// 以下はebidenceのカラー例
 
 class AppColor {
   // ignore: library_private_types_in_public_api
