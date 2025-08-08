@@ -84,4 +84,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'hello-world-db04f.firebasestorage.app',
     measurementId: 'G-M92XTC6FZN',
   );
+
 }
