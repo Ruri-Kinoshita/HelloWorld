@@ -40,49 +40,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAoirfPrWntcHwYNx5D5R5H5Wp75mxH7N4',
-    appId: '1:949515363359:web:61e2dce558b047ba8ae12a',
-    messagingSenderId: '949515363359',
-    projectId: 'hello-world-db04f',
-    authDomain: 'hello-world-db04f.firebaseapp.com',
-    storageBucket: 'hello-world-db04f.firebasestorage.app',
-    measurementId: 'G-RBZH11T3H7',
+    apiKey: 'AIzaSyCQign7mfW2KdzY3ChH_54z_sYAB12bxGk',
+    appId: '1:304526874075:web:66a7a3af5c9ddaed2f43fe',
+    messagingSenderId: '304526874075',
+    projectId: 'helloworld-cef75',
+    authDomain: 'helloworld-cef75.firebaseapp.com',
+    storageBucket: 'helloworld-cef75.firebasestorage.app',
+    measurementId: 'G-FQSZWC2DNH',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC4LT5bpzQ_2ru9nh97MD_WCRjhYFAOdGc',
-    appId: '1:949515363359:android:1a925ee9f54203598ae12a',
-    messagingSenderId: '949515363359',
-    projectId: 'hello-world-db04f',
-    storageBucket: 'hello-world-db04f.firebasestorage.app',
+    apiKey: 'AIzaSyDSPV9un737BkFP5i3jt99P-5KSmtPSxYU',
+    appId: '1:304526874075:android:cf1ba72add7d938a2f43fe',
+    messagingSenderId: '304526874075',
+    projectId: 'helloworld-cef75',
+    storageBucket: 'helloworld-cef75.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAp_wh4WU-cyxrTJUkj1UT3cnQD_eQ4xds',
-    appId: '1:949515363359:ios:d2eb64ab5f73a55e8ae12a',
-    messagingSenderId: '949515363359',
-    projectId: 'hello-world-db04f',
-    storageBucket: 'hello-world-db04f.firebasestorage.app',
+    apiKey: 'AIzaSyAdWVQ8BIxR1_rOAwYFoznRWtyNN6lGibw',
+    appId: '1:304526874075:ios:c120227541337d952f43fe',
+    messagingSenderId: '304526874075',
+    projectId: 'helloworld-cef75',
+    storageBucket: 'helloworld-cef75.firebasestorage.app',
     iosBundleId: 'com.example.helloworld',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAp_wh4WU-cyxrTJUkj1UT3cnQD_eQ4xds',
-    appId: '1:949515363359:ios:d2eb64ab5f73a55e8ae12a',
-    messagingSenderId: '949515363359',
-    projectId: 'hello-world-db04f',
-    storageBucket: 'hello-world-db04f.firebasestorage.app',
+    apiKey: 'AIzaSyAdWVQ8BIxR1_rOAwYFoznRWtyNN6lGibw',
+    appId: '1:304526874075:ios:c120227541337d952f43fe',
+    messagingSenderId: '304526874075',
+    projectId: 'helloworld-cef75',
+    storageBucket: 'helloworld-cef75.firebasestorage.app',
     iosBundleId: 'com.example.helloworld',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAoirfPrWntcHwYNx5D5R5H5Wp75mxH7N4',
-    appId: '1:949515363359:web:c5a85552daf551348ae12a',
-    messagingSenderId: '949515363359',
-    projectId: 'hello-world-db04f',
-    authDomain: 'hello-world-db04f.firebaseapp.com',
-    storageBucket: 'hello-world-db04f.firebasestorage.app',
-    measurementId: 'G-M92XTC6FZN',
+    apiKey: 'AIzaSyCQign7mfW2KdzY3ChH_54z_sYAB12bxGk',
+    appId: '1:304526874075:web:90ea917c9cf80d122f43fe',
+    messagingSenderId: '304526874075',
+    projectId: 'helloworld-cef75',
+    authDomain: 'helloworld-cef75.firebaseapp.com',
+    storageBucket: 'helloworld-cef75.firebasestorage.app',
+    measurementId: 'G-KEXYSME5M7',
   );
 
 }

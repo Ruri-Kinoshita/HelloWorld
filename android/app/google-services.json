@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "949515363359",
-    "project_id": "hello-world-db04f",
-    "storage_bucket": "hello-world-db04f.firebasestorage.app"
+    "project_number": "304526874075",
+    "project_id": "helloworld-cef75",
+    "storage_bucket": "helloworld-cef75.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:949515363359:android:1a925ee9f54203598ae12a",
+        "mobilesdk_app_id": "1:304526874075:android:cf1ba72add7d938a2f43fe",
         "android_client_info": {
           "package_name": "com.example.helloworld"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC4LT5bpzQ_2ru9nh97MD_WCRjhYFAOdGc"
+          "current_key": "AIzaSyDSPV9un737BkFP5i3jt99P-5KSmtPSxYU"
         }
       ],
       "services": {
