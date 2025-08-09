@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       routeInformationProvider: goRouter.routeInformationProvider,
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
       //home: const Startpage(),
