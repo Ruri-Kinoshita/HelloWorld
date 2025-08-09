@@ -5,6 +5,7 @@ import 'package:helloworld/Role.dart';
 import 'package:helloworld/Share.dart';
 import 'package:helloworld/photo.dart';
 import 'package:helloworld/photo.dart';
+import 'package:helloworld/receive.dart';
 import 'package:helloworld/startpage.dart';
 
 final goRouter = GoRouter(
@@ -59,6 +60,16 @@ final goRouter = GoRouter(
         return MaterialPage(
           key: state.pageKey,
           child: const Sharepage(),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/receive',
+      name: 'receivepage',
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          key: state.pageKey,
+          child: const ReceivePage(),
         );
       },
     ),
