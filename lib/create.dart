@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:helloworld/constant/app_color.dart';
 import 'package:helloworld/constant/app_size.dart';
@@ -133,7 +134,7 @@ class _CreatepageState extends State<Createpage> {
                           'アイコンとコメントは完成後に生成されます。',
                           style: TextStyle(
                             fontSize: screenWidth * 0.032,
-                            color: AppColor.text.gray,
+                            color: AppColor.text.primary,
                           ),
                         ),
                         SizedBox(height: screenHeight * 0.0004), // 余白を小さく調整
@@ -176,7 +177,7 @@ class _CreatepageState extends State<Createpage> {
                                     'コメント生成中...',
                                     style: TextStyle(
                                       fontSize: screenWidth * 0.035,
-                                      color: AppColor.text.gray,
+                                      color: AppColor.text.primary,
                                     ),
                                   ),
                                 ),
@@ -204,7 +205,7 @@ class _CreatepageState extends State<Createpage> {
                                         style: TextStyle(
                                           fontSize: screenWidth *
                                               0.030, // フォントサイズを少し大きく
-                                          color: AppColor.text.gray,
+                                          color: AppColor.text.primary,
                                         ),
                                       ),
                                     ),
@@ -232,6 +233,19 @@ class _CreatepageState extends State<Createpage> {
                                           controller: _nameController,
                                           textAlign:
                                               TextAlign.center, // 中央揃えを追加
+                                          inputFormatters: [
+                                            // ひらがなのみを許可する正規表現パターン
+                                            FilteringTextInputFormatter.allow(
+                                              RegExp(r'[あ-ん゛゜ー]'),
+                                            ),
+                                          ],
+                                          style: TextStyle(
+                                            color:
+                                                Color(0xFF7638FA), // 入力テキストを紫色に
+                                            fontSize: 14,
+                                            fontWeight:
+                                                FontWeight.bold, // 入力テキストを太字に
+                                          ),
                                           decoration: InputDecoration(
                                             hintText: 'ひらがななまえ',
                                             border: OutlineInputBorder(
@@ -417,6 +431,11 @@ class _CreatepageState extends State<Createpage> {
       controller: controller,
       keyboardType: keyboardType,
       textAlign: TextAlign.center, // テキストを中央揃えに
+      style: TextStyle(
+        color: Color(0xFF7638FA), // 入力テキストを紫色に
+        fontSize: 14,
+        fontWeight: FontWeight.bold, // 入力テキストを太字に
+      ),
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
@@ -476,7 +495,8 @@ class _CreatepageState extends State<Createpage> {
               item,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.black,
+                color: Color(0xFF7638FA), // 選択済みテキストを紫色に
+                fontWeight: FontWeight.bold, // 選択済みテキストを太字に
               ),
               textAlign: TextAlign.center,
             ),
