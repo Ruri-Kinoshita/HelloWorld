@@ -1,4 +1,6 @@
 PODS:
+  - camera_avfoundation (0.0.1):
+    - Flutter
   - Firebase/CoreOnly (12.0.0):
     - FirebaseCore (~> 12.0.0)
   - firebase_core (4.0.0):
@@ -23,6 +25,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `Flutter`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
@@ -35,6 +38,8 @@ SPEC REPOS:
     - GoogleUtilities
 
 EXTERNAL SOURCES:
+  camera_avfoundation:
+    :path: ".symlinks/plugins/camera_avfoundation/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   Flutter:
@@ -43,6 +48,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_picker_ios/ios"
 
 SPEC CHECKSUMS:
+  camera_avfoundation: adb0207d868b2d873e895371d88448399ab78d87
   Firebase: 800d487043c0557d9faed71477a38d9aafb08a41
   firebase_core: c70f903d70ec229c08c2f49aba5a8c1338546d40
   FirebaseCore: 055f4ab117d5964158c833f3d5e7ec6d91648d4a

@@ -4,6 +4,7 @@ import 'package:helloworld/Create.dart';
 import 'package:helloworld/Role.dart';
 import 'package:helloworld/Share.dart';
 import 'package:helloworld/photo.dart';
+import 'package:helloworld/photo.dart';
 import 'package:helloworld/startpage.dart';
 
 final goRouter = GoRouter(
@@ -17,7 +18,7 @@ final goRouter = GoRouter(
       pageBuilder: (context, state) {
         return MaterialPage(
           key: state.pageKey,
-          child: const Startpage(),
+          child: Startpage(),
         );
       },
     ),
