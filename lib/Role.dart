@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:helloworld/constant/app_color.dart';
 
 class SelectRolePage extends StatelessWidget {
   const SelectRolePage({super.key});
@@ -74,7 +75,7 @@ class SelectRolePage extends StatelessWidget {
               onPressed: () {},
               child: Text(
                 'エンジニア',
-                style: TextStyle(color: Color(0xFF0D8BD9), fontSize: 18),
+                style: TextStyle(color: AppColor.ui.engineer, fontSize: 18),
               ),
               style: baseButtonStyle,
             ),
@@ -84,7 +85,7 @@ class SelectRolePage extends StatelessWidget {
               onPressed: () {},
               child: Text(
                 'デザイナー',
-                style: TextStyle(color: Color(0xFF7638FA), fontSize: 18),
+                style: TextStyle(color: AppColor.ui.designer, fontSize: 18),
               ),
               style: baseButtonStyle,
             ),
@@ -94,7 +95,7 @@ class SelectRolePage extends StatelessWidget {
               onPressed: () {},
               child: Text(
                 'PM',
-                style: TextStyle(color: Color(0xFFF47A44), fontSize: 18),
+                style: TextStyle(color: AppColor.ui.pm, fontSize: 18),
               ),
               style: baseButtonStyle,
             ),
@@ -104,7 +105,7 @@ class SelectRolePage extends StatelessWidget {
               onPressed: () {},
               child: Text(
                 'ビギナー（初心者）',
-                style: TextStyle(color: Color(0xFF65AE5E), fontSize: 18),
+                style: TextStyle(color: AppColor.ui.beginner, fontSize: 18),
               ),
               style: baseButtonStyle,
             ),

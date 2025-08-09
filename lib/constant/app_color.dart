@@ -2,7 +2,6 @@
 
 import 'dart:ui';
 
-
 class AppColor {
   // ignore: library_private_types_in_public_api
   static final _Brand brand = _Brand();
@@ -43,4 +42,9 @@ class _Ui {
   final Color shimmerBase = const Color(0xFFE0E0E0);
   final Color shimmerHighlight = const Color(0xFFFFFFFF);
   final Color background = const Color(0xFFf2f2f2);
+
+  final Color engineer = const Color(0xFF0D8BD9);
+  final Color designer = const Color(0xFF7638FA);
+  final Color pm = const Color(0xFFF47A44);
+  final Color beginner = const Color(0xFF65AE5E);
 }
