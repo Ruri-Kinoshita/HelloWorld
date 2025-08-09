@@ -1,90 +1,91 @@
 /* eslint-disable max-len */
 /* eslint-disable require-jsdoc */
-
 import {onCall, HttpsError} from "firebase-functions/v2/https";
 import {defineSecret} from "firebase-functions/params";
+import * as admin from "firebase-admin";
 
-// 動的 import 用のユーティリティ（CJSでもOK）
-let _genai: Promise<any> | null = null;
-async function getGenAI() {
-  if (!_genai) _genai = import("@google/genai");
-  return _genai;
-}
+// Node 22 なら fetch / FormData / Blob が標準で使えます
+if (!admin.apps.length) admin.initializeApp();
 
-const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
+const OPENAI_API_KEY = defineSecret("OPENAI_API_KEY");
 
-type InlineData = {data?: string; mimeType?: string};
-type Part = {inlineData?: InlineData; text?: string};
-type InlineImage = {data: string; mimeType: string};
-
-function pickImageInlineData(parts: Part[]): InlineImage | null {
-  for (const p of parts) {
-    const d = p.inlineData;
-    if (d && d.data) return {data: d.data, mimeType: d.mimeType ?? "image/png"};
-  }
-  return null;
-}
-
-export const editImage = onCall(
+export const editImageOpenAI = onCall(
   {
     region: "asia-northeast1",
-    secrets: [GEMINI_API_KEY],
+    secrets: [OPENAI_API_KEY],
     memory: "2GiB",
     timeoutSeconds: 540,
   },
   async (request) => {
     try {
-      const input = (request.data ?? {}) as {
-        imageBase64?: string; prompt?: string; mimeType?: string;
+      const data = (request.data ?? {}) as {
+        // 元写真（必須）
+        imageBase64?: string;
+        // 例: "image/jpeg"
+        mimeType?: string;
+        // 上書きしたい場合
+        prompt?: string;
+        // "1024x1024" など（任意）
+        size?: string;
+        background?: "transparent" | "white";
       };
-      if (!input.imageBase64 || typeof input.imageBase64 !== "string") {
-        throw new HttpsError("invalid-argument", "imageBase64 (base64 string) is required.");
+
+      if (!data.imageBase64) {
+        throw new HttpsError("invalid-argument", "imageBase64 is required.");
       }
 
-      const {GoogleGenAI, Modality} = await getGenAI();
-      const ai = new GoogleGenAI({apiKey: GEMINI_API_KEY.value()});
+      const prompt =
+        data.prompt ??
+        [
+          "Convert the input photo into a chest-up Everskies-like pixel art portrait.",
+          "Keep facial features, hairstyle, accessories, clothing, and colors exactly as in the photo.",
+          "Composition: chest-up, centered, facing forward.",
+          "Authentic 8/16-bit look, visible large pixels, 1px clean outlines, flat cel shading, no gradients.",
+          "Background: transparent.",
+        ].join(" ");
 
-      const userPrompt = input.prompt ?? [
-        "Bust-up pixel art portrait of a cute, fashionable character. From chest up, with detailed clothing faithfully matching the provided reference. Chibi/anime-inspired proportions, large expressive eyes, and a gentle smile. Drawn in authentic retro 16-bit style with visible large pixels, clean 1-pixel outlines, flat 2D cel shading, and no gradients or smooth blending. Color palette limited to soft pastel and bright vibrant colors, 20–30 colors max. High contrast between character and transparent background. 4:3 aspect ratio, pixel resolution ~128x96, then upscaled without smoothing. Cozy, playful mood.",
-        // "Pixel art bust-up portrait of a cute, fashionable character — detailed clothing from chest up, soft pastel and bright vibrant colors, chibi/anime-inspired proportions, clean 1px outlines, flat 2D cell shading, minimal anti-aliasing, high contrast between character and background, transparent background, cozy and playful mood, 4:3 aspect ratio",
-        // "avoid full body",
-        // "顔だけの画像を出して下さい",
-        // "Everskiesのピクセルアートスタイルを勉強して、添付された写真の人物を、ゲームキャラクター風の胸上のドット絵イラストにしてください。服装、髪型、アクセサリー、顔の表情を忠実に再現し写っているものの特徴や色を真似してください。背景は透明でお願いね。可愛らしく、洗練された仕上がりを期待しています。",
-        // "全身ではなく胸上のドット絵イラストを生成してください。",
-        // "3;4の比率で画像を生成して下さい",
-        // "イラストは画像中央に配置して下さい",
-        // // "Convert the attached image into a chest-up pixel art portrait in the style of Everskies game characters. Keep the person's unique facial features, hairstyle, accessories, and clothing exactly as in the image. Preserve accurate colors and proportions. Ensure the character is cute and polished, but still clearly recognizable as the person in the photo. Background: transparent. Output as PNG.",
-        // "Edit the attached image into pixel-art (Everskies-like),",
-        // "full body, keep outfit/hairstyle/accessories/colors.",
-        // "Background: transparent. Output as PNG.",
-      ].join(" ");
+      // 画像ファイル化（multipart用）
+      const bytes = Buffer.from(data.imageBase64, "base64");
+      const blob = new Blob([bytes], {type: data.mimeType ?? "image/jpeg"});
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-preview-image-generation",
-        contents: [{
-          role: "user",
-          parts: [
-            {inlineData: {mimeType: input.mimeType ?? "image/jpeg", data: input.imageBase64}},
-            {text: userPrompt},
-          ],
-        }],
-        config: {responseModalities: [Modality.TEXT, Modality.IMAGE]},
+      const form = new FormData();
+      form.append("model", "gpt-image-1");
+      form.append("prompt", prompt);
+      form.append("image", blob, "input.jpg");
+      // 透明背景を要求（gpt-image-1 は edits で background 指定可）
+      form.append("background", data.background ?? "transparent");
+      // 出力サイズ（必要なら）
+      if (data.size) form.append("size", data.size); // 例 "1024x1024"
+
+      const resp = await fetch("https://api.openai.com/v1/images/edits", {
+        method: "POST",
+        headers: {Authorization: `Bearer ${OPENAI_API_KEY.value()}`},
+        body: form,
       });
 
-      const parts: Part[] = (response.candidates?.[0]?.content?.parts as Part[]) ?? [];
-      const image = pickImageInlineData(parts);
-      if (!image) {
-        const textFallback = parts.map((p)=>p.text).filter(Boolean).join("\n");
-        console.error("[editImage] No image in response. Text:", textFallback);
-        throw new HttpsError("failed-precondition", `No image in response. ${textFallback || ""}`.trim());
+      if (!resp.ok) {
+        const t = await resp.text();
+        throw new HttpsError(
+          "failed-precondition",
+          `OpenAI error: ${resp.status} ${resp.statusText} ${t}`
+        );
       }
 
-      return {imageBase64: image.data, mimeType: image.mimeType};
+      const json = (await resp.json()) as {
+        data:Array<{b64_json:string}>;
+      };
+
+      const b64 = json?.data?.[0]?.b64_json;
+      if (!b64) {
+        throw new HttpsError("failed-precondition", "No image returned from OpenAI.");
+      }
+
+      // 透明はPNG想定
+      return {imageBase64: b64, mimeType: "image/png"};
     } catch (e) {
-      console.error("[editImage] Error:", e);
+      console.error("[editImageOpenAI] Error:", e);
       if (e instanceof HttpsError) throw e;
-      const msg = (e as Error)?.message ?? String(e);
-      throw new HttpsError("internal", msg);
+      throw new HttpsError("internal", (e as Error)?.message ?? String(e));
     }
   }
 );
