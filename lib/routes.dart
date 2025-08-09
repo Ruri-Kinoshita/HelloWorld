@@ -1,0 +1,65 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:helloworld/Create.dart';
+import 'package:helloworld/Role.dart';
+import 'package:helloworld/Share.dart';
+import 'package:helloworld/photo.dart';
+import 'package:helloworld/startpage.dart';
+
+final goRouter = GoRouter(
+  // アプリが起動した時
+  initialLocation: '/',
+  // パスと画面の組み合わせ
+  routes: [
+    GoRoute(
+      path: '/',
+      name: 'startpage',
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          key: state.pageKey,
+          child: const Startpage(),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/photo',
+      name: 'photo',
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          key: state.pageKey,
+          child: const photoPage(),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/role',
+      name: 'SelectRolePage',
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          key: state.pageKey,
+          child: const SelectRolePage(),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/create',
+      name: 'CreatePage',
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          key: state.pageKey,
+          child: const Createpage(),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/share',
+      name: 'SharePage',
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          key: state.pageKey,
+          child: const Sharepage(),
+        );
+      },
+    ),
+  ],
+);
