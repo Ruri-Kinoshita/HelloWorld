@@ -1,14 +1,13 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'dart:typed_data';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:image/image.dart' as img;
 
 
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_ai/firebase_ai.dart';
 
 void main() async {
 
@@ -18,11 +17,7 @@ void main() async {
 );
   // Initialize the Gemini Developer API backend service
   // Create a `GenerativeModel` instance with a Gemini model that supports image output
-  final model = FirebaseAI.googleAI().generativeModel(
-    model: 'gemini-2.0-flash-preview-image-generation',
-    // GenerationConfigの設定を調整
-    generationConfig: GenerationConfig(),
-  );
+ 
 
   runApp(const MyApp());
 }
@@ -59,115 +54,85 @@ class _MyHomePageState extends State<MyHomePage> {
   Uint8List? _selectedImageBytes;
   bool _isLoading = false;
   String _statusText = 'ボタンを押して物語を生成してください';
-  String _generatedText = 'ここに生成された物語が表示されます。';
 
   final ImagePicker _picker = ImagePicker();
+
+  Uint8List downscaleJpeg(Uint8List input, {int maxSide = 1024, int quality = 85}) {
+  final original = img.decodeImage(input);
+  if (original == null) return input;
+  final w = original.width, h = original.height;
+  if (w <= maxSide && h <= maxSide) {
+    return Uint8List.fromList(img.encodeJpg(original, quality: quality));
+  }
+  final scale = (w > h) ? maxSide / w : maxSide / h;
+  final resized = img.copyResize(original, width: (w * scale).round(), height: (h * scale).round());
+  return Uint8List.fromList(img.encodeJpg(resized, quality: quality));
+}
+
 
   // --- 2. ユーザーが画像を選択するための関数です ---
   Future<void> _pickImage() async {
     final XFile? imageFile = await _picker.pickImage(source: ImageSource.gallery);
     if (imageFile != null) {
       final bytes = await imageFile.readAsBytes();
+      final small = downscaleJpeg(bytes);
       setState(() {
-        _selectedImageBytes = bytes;
+        _selectedImageBytes = small;
         _statusText = '画像が選択されました！下のボタンで生成を開始します。';
         _generatedImageBytes = null; // 新しい画像を選んだら前の結果をクリア
       });
     }
   }
 
-  Future<void> _generateImage() async {
-    if (_selectedImageBytes == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('先に画像を選択してください。')),
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _statusText = 'アートを生成中です...';
-    });
-
-    try {
-      final vertexAI = FirebaseVertexAI.instanceFor(location: 'asia-northeast1');
-      final model = vertexAI.generativeModel(model: 'gemini-1.5-pro');
-
-      final prompt = [
-        Content.multi([
-          InlineDataPart('image/jpeg', _selectedImageBytes!),
-          TextPart(
-            'TASK: Image-to-Image Transformation. '
-            'INPUT: 1 image (attached). '
-            'OUTPUT_FORMAT: 1 image (image/png). '
-            'STYLE: Pixel art, inspired by the game "Everskies". '
-            'COMPOSITION: Full-body illustration. '
-            'BACKGROUND: Transparent. '
-            'INSTRUCTIONS: Faithfully reproduce clothing, hairstyle, accessories, facial expression, and colors from the attached input image. '
-            'RESPONSE_CONSTRAINT: Your response must ONLY be the raw image data. DO NOT include any text, markdown, or explanatory sentences. Generate the image directly.'
-          ),
-        ])
-      ];
-
-      final response = await model.generateContent(prompt);
-      debugPrint('AI Response: ${response.text}');
-
-      Uint8List? imageBytes;
-      String? responseText = response.text;
-
-      // Base64データの抽出とデコード処理を改善
-      if (responseText != null) {
-        // Base64データの開始マーカーを探す
-        final base64Marker = RegExp(r'iVBORw[a-zA-Z0-9+/=]*');
-        final match = base64Marker.firstMatch(responseText);
-
-        if (match != null) {
-          String base64String = match.group(0)!;
-
-          // 足りない '=' を補う
-          switch (base64String.length % 4) {
-            case 2:
-              base64String += '==';
-              break;
-            case 3:
-              base64String += '=';
-              break;
-          }
-
-          try {
-            imageBytes = base64Decode(base64String);
-          } catch (e) {
-            responseText = 'Base64デコードに失敗しました: $e';
-          }
-        } else {
-          responseText = 'Base64データが見つかりませんでした。';
-        }
-      } else {
-        responseText = 'AIの返答が空でした。';
-      }
-
-      if (imageBytes != null) {
-        setState(() {
-          _generatedImageBytes = imageBytes;
-          _statusText = 'アートが完成しました！';
-        });
-      } else {
-        setState(() {
-          _statusText = 'エラー: AIは画像を生成しませんでした。\nAIの返答: ${responseText ?? "テキストもありませんでした。"}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _statusText = 'エラーが発生しました: ${e.toString()}';
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+  Future<void> _generateImageViaFunctions() async {
+  if (_selectedImageBytes == null) {
+    // 画像未選択
+    return;
   }
 
-  // --- ▲▲▲ ここまでが主な変更点 ▲▲▲ ---
+  setState(() {
+    _isLoading = true;
+    _statusText = 'サーバ側で画像を編集中...';
+  });
+
+  try {
+    final base64Input = base64Encode(_selectedImageBytes!);
+
+    // ★ Functionsのリージョンは "asia-northeast1" に合わせる
+    final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast1')
+        .httpsCallable('editImage');
+
+    final res = await callable.call(<String, dynamic>{
+      'imageBase64': base64Input,
+      'mimeType': 'image/jpeg',
+      'prompt':
+          'Edit the attached image into pixel-art (Everskies-like), full body. Keep outfit/hairstyle/accessories/colors. Background: transparent. Output PNG.'
+    });
+
+    final data = (res.data as Map).cast<String, dynamic>();
+    final String b64 = data['imageBase64'] as String;
+    final String mime = (data['mimeType'] as String?) ?? 'image/png';
+
+    final outBytes = base64Decode(b64);
+
+    setState(() {
+      _generatedImageBytes = outBytes;
+      _statusText = 'アートが完成しました！（$mime）';
+    });
+  } on FirebaseFunctionsException catch (e) {
+    setState(() {
+      _statusText = 'Functionsエラー: ${e.code} ${e.message ?? ""}'.trim();
+    });
+  } catch (e) {
+    setState(() {
+      _statusText = '想定外のエラー: $e';
+    });
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       // 4. ボタンを押したらAPIを呼び出すように変更
       floatingActionButton: FloatingActionButton(
-        onPressed: _isLoading ? null : _generateImage, // 処理中はボタンを押せないようにする
+        onPressed: _isLoading ? null : _generateImageViaFunctions, // 処理中はボタンを押せないようにする
         tooltip: 'Generate Image',
         child: const Icon(Icons.auto_awesome), // アイコンを変更
       ),
