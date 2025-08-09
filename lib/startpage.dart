@@ -22,7 +22,8 @@ class Startpage extends StatelessWidget {
               const SizedBox(height: 20), // 文字とボタンの間隔
               ElevatedButton(
                 onPressed: () {
-                  context.push('/photo');
+                  // context.push('/photo');
+                  context.push('/camera-off'); // カメラオフページに遷移
                   debugPrint('ボタンが押されました');
                 },
                 child: const Text('押してね'),
