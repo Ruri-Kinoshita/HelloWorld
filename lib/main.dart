@@ -106,8 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
       'imageBase64': base64Input,
       'mimeType': 'image/jpeg',
       'prompt':
-          'Edit the attached image into pixel-art (Everskies-like), full body. Keep outfit/hairstyle/accessories/colors. Background: transparent. Output PNG.'
-    });
+          "Bust-up pixel art portrait of a cute, fashionable character. From chest up, with detailed clothing faithfully matching the provided reference. Chibi/anime-inspired proportions, large expressive eyes, and a gentle smile. Drawn in authentic retro 16-bit style with visible large pixels, clean 1-pixel outlines, flat 2D cel shading, and no gradients or smooth blending. Color palette limited to soft pastel and bright vibrant colors, 20–30 colors max. High contrast between character and transparent background. 4:3 aspect ratio, pixel resolution ~128x96, then upscaled without smoothing. Cozy, playful mood.",    });
 
     final data = (res.data as Map).cast<String, dynamic>();
     final String b64 = data['imageBase64'] as String;

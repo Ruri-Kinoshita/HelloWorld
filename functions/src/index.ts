@@ -45,9 +45,18 @@ export const editImage = onCall(
       const ai = new GoogleGenAI({apiKey: GEMINI_API_KEY.value()});
 
       const userPrompt = input.prompt ?? [
-        "Edit the attached image into pixel-art (Everskies-like),",
-        "full body, keep outfit/hairstyle/accessories/colors.",
-        "Background: transparent. Output as PNG.",
+        "Bust-up pixel art portrait of a cute, fashionable character. From chest up, with detailed clothing faithfully matching the provided reference. Chibi/anime-inspired proportions, large expressive eyes, and a gentle smile. Drawn in authentic retro 16-bit style with visible large pixels, clean 1-pixel outlines, flat 2D cel shading, and no gradients or smooth blending. Color palette limited to soft pastel and bright vibrant colors, 20–30 colors max. High contrast between character and transparent background. 4:3 aspect ratio, pixel resolution ~128x96, then upscaled without smoothing. Cozy, playful mood.",
+        // "Pixel art bust-up portrait of a cute, fashionable character — detailed clothing from chest up, soft pastel and bright vibrant colors, chibi/anime-inspired proportions, clean 1px outlines, flat 2D cell shading, minimal anti-aliasing, high contrast between character and background, transparent background, cozy and playful mood, 4:3 aspect ratio",
+        // "avoid full body",
+        // "顔だけの画像を出して下さい",
+        // "Everskiesのピクセルアートスタイルを勉強して、添付された写真の人物を、ゲームキャラクター風の胸上のドット絵イラストにしてください。服装、髪型、アクセサリー、顔の表情を忠実に再現し写っているものの特徴や色を真似してください。背景は透明でお願いね。可愛らしく、洗練された仕上がりを期待しています。",
+        // "全身ではなく胸上のドット絵イラストを生成してください。",
+        // "3;4の比率で画像を生成して下さい",
+        // "イラストは画像中央に配置して下さい",
+        // // "Convert the attached image into a chest-up pixel art portrait in the style of Everskies game characters. Keep the person's unique facial features, hairstyle, accessories, and clothing exactly as in the image. Preserve accurate colors and proportions. Ensure the character is cute and polished, but still clearly recognizable as the person in the photo. Background: transparent. Output as PNG.",
+        // "Edit the attached image into pixel-art (Everskies-like),",
+        // "full body, keep outfit/hairstyle/accessories/colors.",
+        // "Background: transparent. Output as PNG.",
       ].join(" ");
 
       const response = await ai.models.generateContent({
