@@ -79,7 +79,9 @@ class _CreatepageState extends State<Createpage> {
                   // 上部エリア（グレー背景）
                   Container(
                     color: AppColor.ui.background,
-                    padding: EdgeInsets.all(paddingSize),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: paddingSize, vertical: paddingSize * 0.5),
+                    // padding: EdgeInsets.all(paddingSize),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -137,7 +139,7 @@ class _CreatepageState extends State<Createpage> {
                             color: AppColor.text.primary,
                           ),
                         ),
-                        SizedBox(height: screenHeight * 0.0004), // 余白を小さく調整
+                        // SizedBox(height: screenHeight * 0.0004), // 余白を小さく調整
                       ],
                     ),
                   ),
