@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:helloworld/Create.dart';
 import 'package:helloworld/Role.dart';
 import 'package:helloworld/Share.dart';
+import 'package:helloworld/camera_off.dart';
+import 'package:helloworld/photo.dart';
 import 'package:helloworld/photo.dart';
 import 'package:helloworld/startpage.dart';
 
@@ -17,7 +19,7 @@ final goRouter = GoRouter(
       pageBuilder: (context, state) {
         return MaterialPage(
           key: state.pageKey,
-          child: const Startpage(),
+          child: Startpage(),
         );
       },
     ),
@@ -58,6 +60,16 @@ final goRouter = GoRouter(
         return MaterialPage(
           key: state.pageKey,
           child: const Sharepage(),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/camera-off',
+      name: 'CameraOffPage',
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          key: state.pageKey,
+          child: const CameraOffPage(),
         );
       },
     ),

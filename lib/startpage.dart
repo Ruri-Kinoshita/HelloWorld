@@ -49,7 +49,8 @@ class Startpage extends StatelessWidget {
                   children: [
                     InkWell(
                       onTap: () {
-                        context.push('/photo');
+                        // context.push('/photo');
+                        context.push('/camera-off'); // カメラオフページに遷移
                         debugPrint('ボタンが押されました');
                       },
                       child: Container(
@@ -87,12 +88,13 @@ class Startpage extends StatelessWidget {
                   ],
                 ),
               ),
-              Center(
-                child: Column(
-                  children: [
-                    Text('あ'),
-                  ],
-                ),
+              ElevatedButton(
+                onPressed: () {
+                  // context.push('/photo');
+                  context.push('/camera-off'); // カメラオフページに遷移
+                  debugPrint('ボタンが押されました');
+                },
+                child: const Text('押してね'),
               ),
             ],
           ),
