@@ -73,7 +73,7 @@ class _PhotoPageState extends ConsumerState<PhotoPage> {
       ref.read(capturedPhotoProvider.notifier).state = image;
 
       if (!mounted) return;
-      context.push('/create'); // 遷移先はルート定義に合わせて
+      context.push('/role'); // 遷移先はルート定義に合わせて
     } catch (e) {
       debugPrint('撮影失敗: $e');
       if (!mounted) return;
