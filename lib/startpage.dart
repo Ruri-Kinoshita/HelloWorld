@@ -10,7 +10,9 @@ class Startpage extends StatelessWidget {
       home: DefaultTabController(
         length: 2,
         child: Scaffold(
+          backgroundColor: const Color(0xFFDEDADA),
           appBar: AppBar(
+            backgroundColor: const Color(0xFFFFFFFF),
             centerTitle: true,
             title: const Text('Hello World'),
             bottom: const TabBar(
@@ -24,26 +26,6 @@ class Startpage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: Row(
-                  /*
-                  mainAxisSize: MainAxisSize.min, // 中央寄せ
-                  children: [
-                    const Text(
-                      'スタートページ', //一番最初のページ，もらったと作ったのページ
-                      style: TextStyle(
-                        fontSize: 24, // 文字サイズ
-                        fontWeight: FontWeight.bold, // 太字
-                      ),
-                    ),
-                    const SizedBox(height: 20), // 文字とボタンの間隔
-                    ElevatedButton(
-                      onPressed: () {
-                        context.push('/photo');
-                        debugPrint('ボタンが押されました');
-                      },
-                      child: const Text('押してね'),
-                    ),
-                  ],
-                  */
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -77,24 +59,51 @@ class Startpage extends StatelessWidget {
                       width: 172,
                       height: 259,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: Color(0xFFF92929),
-                          width: 5.0,
+                        image: DecorationImage(
+                          image: AssetImage('images/example1.png'),
+                          fit: BoxFit.cover,
                         ),
-                        borderRadius: BorderRadius.circular(0),
                       ),
                     ),
                   ],
                 ),
               ),
-              ElevatedButton(
+              /* ElevatedButton(
                 onPressed: () {
                   context.push('/photo');
                   //context.push('/camera-off'); // カメラオフページに遷移
                   debugPrint('ボタンが押されました');
                 },
                 child: const Text('押してね'),
+              ),*/
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 172,
+                      height: 259,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('images/example1.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 172,
+                      height: 259,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('images/example2.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
