@@ -77,8 +77,11 @@ class Sharepage extends StatelessWidget {
                                 children: [
                                   // アイコン部分
                                   Container(
-                                    width: screenWidth * 0.2,
-                                    height: screenWidth * 0.2 * (4.0 / 3.0),
+                                    width: screenWidth *
+                                        0.24, // 0.28から0.24に調整（適度なサイズ）
+                                    height: screenWidth *
+                                        0.24 *
+                                        (4.0 / 3.0), // 比例して高さも調整
                                     decoration: BoxDecoration(
                                       color: Colors.purple.withOpacity(0.2),
                                       borderRadius: BorderRadius.circular(10),
@@ -88,7 +91,8 @@ class Sharepage extends StatelessWidget {
                                         'アイコン\n生成中...',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          fontSize: screenWidth * 0.030,
+                                          fontSize:
+                                              screenWidth * 0.032, // フォントサイズも調整
                                           color: AppColor.text.primary,
                                         ),
                                       ),
@@ -114,7 +118,7 @@ class Sharepage extends StatelessWidget {
                                           profileData?['name'] ?? 'なまえ',
                                           style: TextStyle(
                                             fontSize: screenWidth *
-                                                0.065, // 画面幅の6.5%（より大きく）
+                                                0.08, // 画面幅の8%（さらに大きく）
                                             fontWeight: FontWeight.bold,
                                             color: Color(0xFF7638FA),
                                           ),
