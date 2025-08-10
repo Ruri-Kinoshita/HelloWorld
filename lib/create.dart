@@ -6,15 +6,16 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:helloworld/constant/app_color.dart';
 import 'package:helloworld/constant/app_size.dart';
+import 'package:helloworld/providers/profile_provider.dart';
 
-class CreatePage extends StatefulWidget {
+class CreatePage extends ConsumerStatefulWidget {
   const CreatePage({super.key});
 
   @override
-  State<CreatePage> createState() => _CreatepageState();
+  ConsumerState<CreatePage> createState() => _CreatepageState();
 }
 
-class _CreatepageState extends State<CreatePage> {
+class _CreatepageState extends ConsumerState<CreatePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _universityController = TextEditingController();
   final TextEditingController _departmentController = TextEditingController();
@@ -527,23 +528,29 @@ class _CreatepageState extends State<CreatePage> {
   }
 
   void _handleSubmit() {
-    final name = _nameController.text;
-    final university = _universityController.text;
-    final department = _departmentController.text;
-    final grade = _selectedGrade;
-    final email = _emailController.text;
-    final tools = _selectedTools.toList();
-    final lifestyle = _selectedLifestyle.toList();
-    final hackathonThought = _selectedHackathonThought.toList();
+    // Riverpodを使ってプロフィールデータを保存
+    final profileData = ProfileData(
+      name: _nameController.text,
+      university: _universityController.text,
+      department: _departmentController.text,
+      email: _emailController.text,
+      grade: _selectedGrade ?? '',
+      tools: _selectedTools.toList(),
+      lifestyle: _selectedLifestyle.toList(),
+      hackathonThought: _selectedHackathonThought.toList(),
+    );
 
-    debugPrint('名前: $name');
-    debugPrint('大学名: $university');
-    debugPrint('学部名: $department');
-    debugPrint('学年: $grade');
-    debugPrint('メールアドレス: $email');
-    debugPrint('よく使うツール: $tools');
-    debugPrint('生活: $lifestyle');
-    debugPrint('ハッカソンに対する思い: $hackathonThought');
+    // プロフィールプロバイダーにデータを保存
+    ref.read(profileProvider.notifier).updateProfile(profileData);
+
+    debugPrint('名前: ${profileData.name}');
+    debugPrint('大学名: ${profileData.university}');
+    debugPrint('学部名: ${profileData.department}');
+    debugPrint('学年: ${profileData.grade}');
+    debugPrint('メールアドレス: ${profileData.email}');
+    debugPrint('よく使うツール: ${profileData.tools}');
+    debugPrint('生活: ${profileData.lifestyle}');
+    debugPrint('ハッカソンに対する思い: ${profileData.hackathonThought}');
   }
 
   Widget _buildToolButton() {
