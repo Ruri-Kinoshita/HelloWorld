@@ -6,15 +6,16 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:helloworld/constant/app_color.dart';
 import 'package:helloworld/constant/app_size.dart';
+import 'package:helloworld/providers/role_providers.dart';
 
-class CreatePage extends StatefulWidget {
+class CreatePage extends ConsumerStatefulWidget {
   const CreatePage({super.key});
 
   @override
-  State<CreatePage> createState() => _CreatepageState();
+  ConsumerState<CreatePage> createState() => _CreatepageState();
 }
 
-class _CreatepageState extends State<CreatePage> {
+class _CreatepageState extends ConsumerState<CreatePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _universityController = TextEditingController();
   final TextEditingController _departmentController = TextEditingController();
@@ -60,6 +61,11 @@ class _CreatepageState extends State<CreatePage> {
 
   @override
   Widget build(BuildContext context) {
+    // ★ Riverpodから選択ロールを取得（未選択時はデフォルト色＆ラベル）
+    final selectedRole = ref.watch(selectedRoleProvider);
+    final Color accentColor = selectedRole?.color ?? const Color(0xFF7638FA);
+    final String roleLabel = selectedRole?.label ?? 'デザイナー';
+
     final screenSize = MediaQuery.of(context).size;
     final screenHeight = screenSize.height;
     final screenWidth = screenSize.width;
@@ -101,7 +107,7 @@ class _CreatepageState extends State<CreatePage> {
                                   : null, // 全ての項目が完了していない場合は無効
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: _isAllFieldsCompleted()
-                                    ? Color(0xFF333333) // 完了時は#333333
+                                    ? const Color(0xFF333333) // 完了時は#333333
                                     : AppColor.text.gray, // 未完了時はグレー
                                 foregroundColor: AppColor.text.white,
                                 shape: RoundedRectangleBorder(
@@ -173,7 +179,7 @@ class _CreatepageState extends State<CreatePage> {
                                 width: double.infinity,
                                 height: containerHeight,
                                 decoration: BoxDecoration(
-                                  color: Colors.purple.withOpacity(0.2),
+                                  color: accentColor.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(
                                       UiSize.minimumGridCircular),
                                 ),
@@ -199,7 +205,7 @@ class _CreatepageState extends State<CreatePage> {
                                     width: iconWidth,
                                     height: iconHeight,
                                     decoration: BoxDecoration(
-                                      color: Colors.purple.withOpacity(0.2),
+                                      color: accentColor.withOpacity(0.2),
                                       borderRadius: BorderRadius.circular(
                                           UiSize.minimumGridCircular),
                                     ),
@@ -226,11 +232,11 @@ class _CreatepageState extends State<CreatePage> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'デザイナーの',
+                                          '$roleLabelの',
                                           style: TextStyle(
                                             fontSize: screenWidth * 0.040,
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFF7638FA),
+                                            color: accentColor,
                                           ),
                                         ),
                                         SizedBox(height: screenHeight * 0.005),
@@ -245,8 +251,7 @@ class _CreatepageState extends State<CreatePage> {
                                             ),
                                           ],
                                           style: TextStyle(
-                                            color:
-                                                Color(0xFF7638FA), // 入力テキストを紫色に
+                                            color: accentColor, // 入力テキストをロール色に
                                             fontSize: 14,
                                             fontWeight:
                                                 FontWeight.bold, // 入力テキストを太字に
@@ -278,6 +283,7 @@ class _CreatepageState extends State<CreatePage> {
                               _buildTextField(
                                 controller: _universityController,
                                 hintText: '大学名入力',
+                                accentColor: accentColor,
                               ),
                               SizedBox(height: screenHeight * 0.005),
 
@@ -289,6 +295,7 @@ class _CreatepageState extends State<CreatePage> {
                                     child: _buildTextField(
                                       controller: _departmentController,
                                       hintText: '学部名入力',
+                                      accentColor: accentColor,
                                     ),
                                   ),
                                   SizedBox(width: paddingSize),
@@ -308,6 +315,7 @@ class _CreatepageState extends State<CreatePage> {
                                       ],
                                       onChanged: (value) => setState(
                                           () => _selectedGrade = value),
+                                      accentColor: accentColor,
                                     ),
                                   ),
                                 ],
@@ -331,6 +339,7 @@ class _CreatepageState extends State<CreatePage> {
                                       controller: _emailController,
                                       hintText: 'メールアドレス入力',
                                       keyboardType: TextInputType.emailAddress,
+                                      accentColor: accentColor,
                                     ),
                                   ),
                                 ],
@@ -342,8 +351,9 @@ class _CreatepageState extends State<CreatePage> {
                                 'よく使うツール',
                                 () => setState(() => _showToolSelector = true),
                                 _selectedTools.isNotEmpty,
+                                accentColor,
                               ),
-                              _buildToolButton(),
+                              _buildToolButton(accentColor),
                               SizedBox(height: screenHeight * 0.010), // 少し削減
 
                               // 生活
@@ -352,8 +362,9 @@ class _CreatepageState extends State<CreatePage> {
                                 () => setState(
                                     () => _showLifestyleSelector = true),
                                 _selectedLifestyle.isNotEmpty,
+                                accentColor,
                               ),
-                              _buildLifestyleButton(),
+                              _buildLifestyleButton(accentColor),
                               SizedBox(height: screenHeight * 0.010), // 少し削減
 
                               // ハッカソンに対する思い
@@ -362,8 +373,9 @@ class _CreatepageState extends State<CreatePage> {
                                 () => setState(
                                     () => _showHackathonSelector = true),
                                 _selectedHackathonThought.isNotEmpty,
+                                accentColor,
                               ),
-                              _buildHackathonButton(),
+                              _buildHackathonButton(accentColor),
                               SizedBox(
                                   height: screenHeight * 0.006), // 最後の余白を半分に削減
                             ],
@@ -375,9 +387,11 @@ class _CreatepageState extends State<CreatePage> {
                 ],
               ),
               // オーバーレイ
-              if (_showToolSelector) _buildToolSelectorOverlay(),
-              if (_showLifestyleSelector) _buildLifestyleSelectorOverlay(),
-              if (_showHackathonSelector) _buildHackathonSelectorOverlay(),
+              if (_showToolSelector) _buildToolSelectorOverlay(accentColor),
+              if (_showLifestyleSelector)
+                _buildLifestyleSelectorOverlay(accentColor),
+              if (_showHackathonSelector)
+                _buildHackathonSelectorOverlay(accentColor),
             ],
           ),
         ),
@@ -386,7 +400,7 @@ class _CreatepageState extends State<CreatePage> {
   }
 
   Widget _buildSectionTitleWithEdit(
-      String title, VoidCallback onEdit, bool hasSelection) {
+      String title, VoidCallback onEdit, bool hasSelection, Color accentColor) {
     final screenSize = MediaQuery.of(context).size;
 
     return Padding(
@@ -402,11 +416,11 @@ class _CreatepageState extends State<CreatePage> {
             ),
           ),
           if (hasSelection) ...[
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             GestureDetector(
               onTap: onEdit,
               child: Container(
-                padding: EdgeInsets.all(4),
+                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(4),
@@ -414,7 +428,7 @@ class _CreatepageState extends State<CreatePage> {
                 child: Icon(
                   Icons.edit,
                   size: 14,
-                  color: Color(0xFF7638FA), // 編集アイコンを紫に
+                  color: accentColor, // ★ 編集アイコンをロール色に
                 ),
               ),
             ),
@@ -428,6 +442,7 @@ class _CreatepageState extends State<CreatePage> {
     required TextEditingController controller,
     required String hintText,
     TextInputType? keyboardType,
+    required Color accentColor, // ★ 追加
   }) {
     final screenSize = MediaQuery.of(context).size;
     final paddingSize = screenSize.width * 0.03; // 水平パディングも小さく
@@ -437,13 +452,13 @@ class _CreatepageState extends State<CreatePage> {
       keyboardType: keyboardType,
       textAlign: TextAlign.center, // テキストを中央揃えに
       style: TextStyle(
-        color: Color(0xFF7638FA), // 入力テキストを紫色に
+        color: accentColor, // 入力テキストをロール色に
         fontSize: 14,
         fontWeight: FontWeight.bold, // 入力テキストを太字に
       ),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(
+        hintStyle: const TextStyle(
           textBaseline: TextBaseline.alphabetic,
         ),
         border: OutlineInputBorder(
@@ -464,6 +479,7 @@ class _CreatepageState extends State<CreatePage> {
     required String hintText,
     required List<String> items,
     required void Function(String?) onChanged,
+    required Color accentColor, // ★ 追加
   }) {
     final screenSize = MediaQuery.of(context).size;
     final paddingSize = screenSize.width * 0.03; // 水平パディングも小さく
@@ -474,7 +490,7 @@ class _CreatepageState extends State<CreatePage> {
       alignment: Alignment.center, // ドロップダウン全体を中央揃えに
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(
+        hintStyle: const TextStyle(
           textBaseline: TextBaseline.alphabetic,
         ),
         border: OutlineInputBorder(
@@ -500,7 +516,7 @@ class _CreatepageState extends State<CreatePage> {
               item,
               style: TextStyle(
                 fontSize: 14,
-                color: Color(0xFF7638FA), // 選択済みテキストを紫色に
+                color: accentColor, // 選択済みテキストをロール色に
                 fontWeight: FontWeight.bold, // 選択済みテキストを太字に
               ),
               textAlign: TextAlign.center,
@@ -516,7 +532,7 @@ class _CreatepageState extends State<CreatePage> {
             child: Text(
               item,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 14), // フォントサイズを少し小さく
+              style: const TextStyle(fontSize: 14), // フォントサイズを少し小さく
               textAlign: TextAlign.center, // テキストを中央揃えに
             ),
           ),
@@ -546,10 +562,10 @@ class _CreatepageState extends State<CreatePage> {
     debugPrint('ハッカソンに対する思い: $hackathonThought');
   }
 
-  Widget _buildToolButton() {
+  Widget _buildToolButton(Color accentColor) {
     if (_selectedTools.isEmpty) {
       // 未選択の場合は「選ぶ」ボタンを表示
-      return Container(
+      return SizedBox(
         width: double.infinity,
         height: 35, // 高さを40から35に変更
         child: ElevatedButton(
@@ -586,12 +602,13 @@ class _CreatepageState extends State<CreatePage> {
             runSpacing: 8,
             children: _selectedTools.map((tool) {
               return Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white, // 背景を白に
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Color(0xFF7638FA), // 枠線を紫に
+                    color: accentColor, // 枠線をロール色に
                     width: 1,
                   ),
                 ),
@@ -602,11 +619,11 @@ class _CreatepageState extends State<CreatePage> {
                       tool,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF7638FA), // テキストを紫に
+                        color: accentColor, // テキストをロール色に
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     GestureDetector(
                       onTap: () {
                         setState(() {
@@ -616,7 +633,7 @@ class _CreatepageState extends State<CreatePage> {
                       child: Icon(
                         Icons.close,
                         size: 16,
-                        color: Color(0xFF7638FA), // アイコンを紫に
+                        color: accentColor, // アイコンをロール色に
                       ),
                     ),
                   ],
@@ -629,10 +646,10 @@ class _CreatepageState extends State<CreatePage> {
     }
   }
 
-  Widget _buildLifestyleButton() {
+  Widget _buildLifestyleButton(Color accentColor) {
     if (_selectedLifestyle.isEmpty) {
       // 未選択の場合は「選ぶ」ボタンを表示
-      return Container(
+      return SizedBox(
         width: double.infinity,
         height: 35, // 高さを40から35に変更
         child: ElevatedButton(
@@ -669,12 +686,13 @@ class _CreatepageState extends State<CreatePage> {
             runSpacing: 8,
             children: _selectedLifestyle.map((lifestyle) {
               return Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white, // 背景を白に
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Color(0xFF7638FA), // 枠線を紫に
+                    color: accentColor, // 枠線をロール色に
                     width: 1,
                   ),
                 ),
@@ -685,11 +703,11 @@ class _CreatepageState extends State<CreatePage> {
                       lifestyle,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF7638FA), // テキストを紫に
+                        color: accentColor, // テキストをロール色に
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     GestureDetector(
                       onTap: () {
                         setState(() {
@@ -699,7 +717,7 @@ class _CreatepageState extends State<CreatePage> {
                       child: Icon(
                         Icons.close,
                         size: 16,
-                        color: Color(0xFF7638FA), // アイコンを紫に
+                        color: accentColor, // アイコンをロール色に
                       ),
                     ),
                   ],
@@ -712,10 +730,10 @@ class _CreatepageState extends State<CreatePage> {
     }
   }
 
-  Widget _buildHackathonButton() {
+  Widget _buildHackathonButton(Color accentColor) {
     if (_selectedHackathonThought.isEmpty) {
       // 未選択の場合は「選ぶ」ボタンを表示
-      return Container(
+      return SizedBox(
         width: double.infinity,
         height: 35, // 高さを40から35に変更
         child: ElevatedButton(
@@ -752,12 +770,13 @@ class _CreatepageState extends State<CreatePage> {
             runSpacing: 8,
             children: _selectedHackathonThought.map((thought) {
               return Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white, // 背景を白に
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Color(0xFF7638FA), // 枠線を紫に
+                    color: accentColor, // 枠線をロール色に
                     width: 1,
                   ),
                 ),
@@ -769,12 +788,12 @@ class _CreatepageState extends State<CreatePage> {
                         thought,
                         style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF7638FA), // テキストを紫に
+                          color: accentColor, // テキストをロール色に
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     GestureDetector(
                       onTap: () {
                         setState(() {
@@ -784,7 +803,7 @@ class _CreatepageState extends State<CreatePage> {
                       child: Icon(
                         Icons.close,
                         size: 16,
-                        color: Color(0xFF7638FA), // アイコンを紫に
+                        color: accentColor, // アイコンをロール色に
                       ),
                     ),
                   ],
@@ -797,7 +816,7 @@ class _CreatepageState extends State<CreatePage> {
     }
   }
 
-  Widget _buildToolSelectorOverlay() {
+  Widget _buildToolSelectorOverlay(Color accentColor) {
     final availableTools = [
       'Figma',
       'Adobe XD',
@@ -817,7 +836,7 @@ class _CreatepageState extends State<CreatePage> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
@@ -825,7 +844,7 @@ class _CreatepageState extends State<CreatePage> {
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
               blurRadius: 10,
-              offset: Offset(0, -2),
+              offset: const Offset(0, -2),
             ),
           ],
         ),
@@ -834,7 +853,7 @@ class _CreatepageState extends State<CreatePage> {
           children: [
             // ハンドル
             Container(
-              margin: EdgeInsets.only(top: 8),
+              margin: const EdgeInsets.only(top: 8),
               width: 40,
               height: 4,
               decoration: BoxDecoration(
@@ -845,11 +864,11 @@ class _CreatepageState extends State<CreatePage> {
 
             // ヘッダー
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     'よく使うツール',
                     style: TextStyle(
                       fontSize: 18,
@@ -862,7 +881,7 @@ class _CreatepageState extends State<CreatePage> {
                         _showToolSelector = false;
                       });
                     },
-                    icon: Icon(Icons.close),
+                    icon: const Icon(Icons.close),
                   ),
                 ],
               ),
@@ -870,7 +889,7 @@ class _CreatepageState extends State<CreatePage> {
 
             // 選択数の表示
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
                   Text(
@@ -880,7 +899,7 @@ class _CreatepageState extends State<CreatePage> {
                       color: Colors.grey[600],
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Text(
                     '${_selectedTools.length}/3',
                     style: TextStyle(
@@ -897,7 +916,7 @@ class _CreatepageState extends State<CreatePage> {
 
             // チップ選択エリア
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -908,17 +927,17 @@ class _CreatepageState extends State<CreatePage> {
                       tool,
                       style: TextStyle(
                         fontSize: 14,
-                        color: isSelected ? Colors.white : Color(0xFF7638FA),
+                        color: isSelected ? Colors.white : accentColor,
                       ),
                     ),
                     selected: isSelected,
-                    selectedColor: Color(0xFF7638FA),
+                    selectedColor: accentColor,
                     checkmarkColor: Colors.white,
                     backgroundColor: Colors.white, // 背景を白に
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20), // 角をもっと丸く
                       side: BorderSide(
-                        color: Color(0xFF7638FA), // 枠線を紫に
+                        color: accentColor, // 枠線をロール色に
                         width: 1,
                       ),
                     ),
@@ -940,7 +959,7 @@ class _CreatepageState extends State<CreatePage> {
 
             // 完了ボタン
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -950,14 +969,14 @@ class _CreatepageState extends State<CreatePage> {
                     });
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF7638FA),
+                    backgroundColor: accentColor,
                     foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20), // 角をもっと丸く
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     '完了',
                     style: TextStyle(
                       fontSize: 16,
@@ -973,7 +992,7 @@ class _CreatepageState extends State<CreatePage> {
     );
   }
 
-  Widget _buildLifestyleSelectorOverlay() {
+  Widget _buildLifestyleSelectorOverlay(Color accentColor) {
     final lifestyleOptions = [
       '朝型',
       '夜型',
@@ -984,170 +1003,20 @@ class _CreatepageState extends State<CreatePage> {
       '夜バイトある'
     ];
 
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10,
-              offset: Offset(0, -2),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // ハンドル
-            Container(
-              margin: EdgeInsets.only(top: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-
-            // ヘッダー
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '生活',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _showLifestyleSelector = false;
-                      });
-                    },
-                    icon: Icon(Icons.close),
-                  ),
-                ],
-              ),
-            ),
-
-            // 選択数の表示
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Text(
-                    '最大3つ選んでください',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  Spacer(),
-                  Text(
-                    '${_selectedLifestyle.length}/3',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: _selectedLifestyle.length >= 3
-                          ? Colors.red
-                          : Colors.grey[600],
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // チップ選択エリア
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: lifestyleOptions.map((option) {
-                  final isSelected = _selectedLifestyle.contains(option);
-                  return FilterChip(
-                    label: Text(
-                      option,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: isSelected ? Colors.white : Color(0xFF7638FA),
-                      ),
-                    ),
-                    selected: isSelected,
-                    selectedColor: Color(0xFF7638FA),
-                    checkmarkColor: Colors.white,
-                    backgroundColor: Colors.white, // 背景を白に
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20), // 角をもっと丸く
-                      side: BorderSide(
-                        color: Color(0xFF7638FA), // 枠線を紫に
-                        width: 1,
-                      ),
-                    ),
-                    onSelected: (selected) {
-                      setState(() {
-                        if (selected) {
-                          if (_selectedLifestyle.length < 3) {
-                            _selectedLifestyle.add(option);
-                          }
-                        } else {
-                          _selectedLifestyle.remove(option);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
-
-            // 完了ボタン
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _showLifestyleSelector = false;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF7638FA),
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20), // 角をもっと丸く
-                    ),
-                  ),
-                  child: Text(
-                    '完了',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return _buildGenericSelectorOverlay(
+      title: '生活',
+      options: lifestyleOptions,
+      selected: _selectedLifestyle,
+      onClose: () {
+        setState(() {
+          _showLifestyleSelector = false;
+        });
+      },
+      accentColor: accentColor,
     );
   }
 
-  Widget _buildHackathonSelectorOverlay() {
+  Widget _buildHackathonSelectorOverlay(Color accentColor) {
     final hackathonOptions = [
       '熱意ありあり',
       'やる気はある',
@@ -1160,6 +1029,27 @@ class _CreatepageState extends State<CreatePage> {
       '寝不足上等'
     ];
 
+    return _buildGenericSelectorOverlay(
+      title: 'ハッカソンに対する思い',
+      options: hackathonOptions,
+      selected: _selectedHackathonThought,
+      onClose: () {
+        setState(() {
+          _showHackathonSelector = false;
+        });
+      },
+      accentColor: accentColor,
+    );
+  }
+
+  // 汎用オーバーレイ（生活/ハッカソン）
+  Widget _buildGenericSelectorOverlay({
+    required String title,
+    required List<String> options,
+    required Set<String> selected,
+    required VoidCallback onClose,
+    required Color accentColor,
+  }) {
     return Positioned(
       bottom: 0,
       left: 0,
@@ -1167,7 +1057,7 @@ class _CreatepageState extends State<CreatePage> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
@@ -1175,7 +1065,7 @@ class _CreatepageState extends State<CreatePage> {
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
               blurRadius: 10,
-              offset: Offset(0, -2),
+              offset: const Offset(0, -2),
             ),
           ],
         ),
@@ -1184,7 +1074,7 @@ class _CreatepageState extends State<CreatePage> {
           children: [
             // ハンドル
             Container(
-              margin: EdgeInsets.only(top: 8),
+              margin: const EdgeInsets.only(top: 8),
               width: 40,
               height: 4,
               decoration: BoxDecoration(
@@ -1195,24 +1085,20 @@ class _CreatepageState extends State<CreatePage> {
 
             // ヘッダー
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'ハッカソンに対する思い',
-                    style: TextStyle(
+                    title,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _showHackathonSelector = false;
-                      });
-                    },
-                    icon: Icon(Icons.close),
+                    onPressed: onClose,
+                    icon: const Icon(Icons.close),
                   ),
                 ],
               ),
@@ -1220,7 +1106,7 @@ class _CreatepageState extends State<CreatePage> {
 
             // 選択数の表示
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
                   Text(
@@ -1230,14 +1116,13 @@ class _CreatepageState extends State<CreatePage> {
                       color: Colors.grey[600],
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Text(
-                    '${_selectedHackathonThought.length}/3',
+                    '${selected.length}/3',
                     style: TextStyle(
                       fontSize: 12,
-                      color: _selectedHackathonThought.length >= 3
-                          ? Colors.red
-                          : Colors.grey[600],
+                      color:
+                          selected.length >= 3 ? Colors.red : Colors.grey[600],
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1247,39 +1132,39 @@ class _CreatepageState extends State<CreatePage> {
 
             // チップ選択エリア
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: hackathonOptions.map((option) {
-                  final isSelected = _selectedHackathonThought.contains(option);
+                children: options.map((option) {
+                  final isSelected = selected.contains(option);
                   return FilterChip(
                     label: Text(
                       option,
                       style: TextStyle(
                         fontSize: 14,
-                        color: isSelected ? Colors.white : Color(0xFF7638FA),
+                        color: isSelected ? Colors.white : accentColor,
                       ),
                     ),
                     selected: isSelected,
-                    selectedColor: Color(0xFF7638FA),
+                    selectedColor: accentColor,
                     checkmarkColor: Colors.white,
                     backgroundColor: Colors.white, // 背景を白に
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20), // 角をもっと丸く
                       side: BorderSide(
-                        color: Color(0xFF7638FA), // 枠線を紫に
+                        color: accentColor, // 枠線をロール色に
                         width: 1,
                       ),
                     ),
-                    onSelected: (selected) {
+                    onSelected: (selectedFlag) {
                       setState(() {
-                        if (selected) {
-                          if (_selectedHackathonThought.length < 3) {
-                            _selectedHackathonThought.add(option);
+                        if (selectedFlag) {
+                          if (selected.length < 3) {
+                            selected.add(option);
                           }
                         } else {
-                          _selectedHackathonThought.remove(option);
+                          selected.remove(option);
                         }
                       });
                     },
@@ -1290,24 +1175,20 @@ class _CreatepageState extends State<CreatePage> {
 
             // 完了ボタン
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _showHackathonSelector = false;
-                    });
-                  },
+                  onPressed: onClose,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF7638FA),
+                    backgroundColor: accentColor,
                     foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20), // 角をもっと丸く
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     '完了',
                     style: TextStyle(
                       fontSize: 16,
