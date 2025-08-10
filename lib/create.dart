@@ -7,14 +7,14 @@ import 'package:go_router/go_router.dart';
 import 'package:helloworld/constant/app_color.dart';
 import 'package:helloworld/constant/app_size.dart';
 
-class Createpage extends StatefulWidget {
-  const Createpage({super.key});
+class CreatePage extends StatefulWidget {
+  const CreatePage({super.key});
 
   @override
-  State<Createpage> createState() => _CreatepageState();
+  State<CreatePage> createState() => _CreatepageState();
 }
 
-class _CreatepageState extends State<Createpage> {
+class _CreatepageState extends State<CreatePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _universityController = TextEditingController();
   final TextEditingController _departmentController = TextEditingController();

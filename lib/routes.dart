@@ -5,7 +5,6 @@ import 'package:helloworld/Role.dart';
 import 'package:helloworld/Share.dart';
 import 'package:helloworld/camera_off.dart';
 import 'package:helloworld/photo.dart';
-import 'package:helloworld/photo.dart';
 import 'package:helloworld/receive.dart';
 import 'package:helloworld/startpage.dart';
 
@@ -65,24 +64,22 @@ final goRouter = GoRouter(
       },
     ),
     GoRoute(
-
       path: '/receive',
       name: 'receivepage',
       pageBuilder: (context, state) {
         return MaterialPage(
           key: state.pageKey,
           child: const ReceivePage(),
-            );
+        );
       },
     ),
-
+    GoRoute(
       path: '/camera-off',
       name: 'CameraOffPage',
       pageBuilder: (context, state) {
         return MaterialPage(
           key: state.pageKey,
           child: const CameraOffPage(),
-
         );
       },
     ),
