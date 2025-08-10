@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:go_router/go_router.dart';
-import 'package:helloworld/constant/app_color.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class photoPage extends StatefulWidget {
-  const photoPage({Key? key}) : super(key: key);
+import 'package:helloworld/constant/app_color.dart';
+import 'package:helloworld/providers/photo_providers.dart';
+
+class PhotoPage extends ConsumerStatefulWidget {
+  const PhotoPage({Key? key}) : super(key: key);
 
   @override
-  State<photoPage> createState() => _photoPage();
+  ConsumerState<PhotoPage> createState() => _PhotoPageState();
 }
 
-class _photoPage extends State<photoPage> {
+class _PhotoPageState extends ConsumerState<PhotoPage> {
   CameraController? _controller;
   List<CameraDescription>? _cameras;
   bool _isCameraInitialized = false;
@@ -22,23 +25,32 @@ class _photoPage extends State<photoPage> {
   }
 
   Future<void> _initCamera() async {
-    _cameras = await availableCameras();
-    if (_cameras != null && _cameras!.isNotEmpty) {
-      // 内カメラ（フロント）を探す
-      final frontCamera = _cameras!.firstWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.front,
-        orElse: () => _cameras!.first, // 見つからなければ最初のカメラ
-      );
+    try {
+      _cameras = await availableCameras();
+      if (!mounted) return;
 
-      _controller = CameraController(
-        frontCamera,
-        ResolutionPreset.medium,
-        enableAudio: false,
+      if (_cameras != null && _cameras!.isNotEmpty) {
+        final frontCamera = _cameras!.firstWhere(
+          (camera) => camera.lensDirection == CameraLensDirection.front,
+          orElse: () => _cameras!.first,
+        );
+
+        _controller = CameraController(
+          frontCamera,
+          ResolutionPreset.medium,
+          enableAudio: false,
+        );
+
+        await _controller!.initialize();
+        if (!mounted) return;
+
+        setState(() => _isCameraInitialized = true);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('カメラの初期化に失敗しました: $e')),
       );
-      await _controller!.initialize();
-      setState(() {
-        _isCameraInitialized = true;
-      });
     }
   }
 
@@ -48,14 +60,26 @@ class _photoPage extends State<photoPage> {
     super.dispose();
   }
 
-  void _takePicture() async {
-    if (_controller != null && _controller!.value.isInitialized) {
-      final image = await _controller!.takePicture();
-      // 撮影後の処理
-      debugPrint('保存先: ${image.path}'); //TODO:あとでリバーポッド導入
-      if (mounted) {
-        context.push('/role'); // GoRouterで遷移
-      }
+  /// 撮影して Riverpod に保持し、次画面へ遷移
+  Future<void> _takePicture() async {
+    final ctrl = _controller;
+    if (ctrl == null || !ctrl.value.isInitialized) return;
+
+    try {
+      final image = await ctrl.takePicture();
+      debugPrint('保存先: ${image.path}');
+
+      // 撮った写真を Riverpod に保持
+      ref.read(capturedPhotoProvider.notifier).state = image;
+
+      if (!mounted) return;
+      context.push('/create'); // 遷移先はルート定義に合わせて
+    } catch (e) {
+      debugPrint('撮影失敗: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('撮影に失敗しました')),
+      );
     }
   }
 
@@ -63,11 +87,13 @@ class _photoPage extends State<photoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.brand.primary,
-      body: _isCameraInitialized
-          ? Stack(
+      body: Stack(
+        children: [
+          if (_isCameraInitialized)
+            Stack(
               children: [
                 Align(
-                  alignment: Alignment(0, -0.2), // yを-1.0に近づけるほど上に寄る
+                  alignment: const Alignment(0, -0.2),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: SizedBox(
@@ -77,8 +103,6 @@ class _photoPage extends State<photoPage> {
                     ),
                   ),
                 ),
-
-                // 上部テキスト
                 Positioned(
                   top: 100,
                   left: 20,
@@ -93,7 +117,6 @@ class _photoPage extends State<photoPage> {
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
-                        textAlign: TextAlign.start,
                       ),
                       Text(
                         "丸枠に顔を収めてください",
@@ -102,30 +125,23 @@ class _photoPage extends State<photoPage> {
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
-                        textAlign: TextAlign.start,
                       ),
                     ],
                   ),
                 ),
-
                 Align(
-                  alignment: Alignment(0, -0.3), // -1.0に近いほど上
+                  alignment: const Alignment(0, -0.3),
                   child: Container(
                     width: 180,
                     height: 234,
                     decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.red,
-                        width: 6,
-                      ),
+                      border: Border.all(color: Colors.red, width: 6),
                       borderRadius: const BorderRadius.all(
                         Radius.elliptical(200, 300),
                       ),
                     ),
                   ),
                 ),
-
-                // 撮影ボタン
                 Positioned(
                   bottom: 55,
                   left: 0,
@@ -134,17 +150,17 @@ class _photoPage extends State<photoPage> {
                     child: GestureDetector(
                       onTap: _takePicture,
                       child: Container(
-                        padding: const EdgeInsets.all(4), // グレー枠の太さ
+                        padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.grey.shade300, // 外側リングの色
+                          color: Colors.grey.shade300,
                         ),
                         child: Container(
-                          width: 70, // 内側ボタンのサイズ
+                          width: 70,
                           height: 70,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white, // 内側ボタンの色
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -153,7 +169,10 @@ class _photoPage extends State<photoPage> {
                 ),
               ],
             )
-          : const Center(child: CircularProgressIndicator()),
+          else
+            const Center(child: CircularProgressIndicator()),
+        ],
+      ),
     );
   }
 }

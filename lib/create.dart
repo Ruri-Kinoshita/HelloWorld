@@ -1,17 +1,20 @@
+// create.dart
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:helloworld/constant/app_color.dart';
 import 'package:helloworld/constant/app_size.dart';
 
-class Createpage extends StatefulWidget {
-  const Createpage({super.key});
+class CreatePage extends StatefulWidget {
+  const CreatePage({super.key});
 
   @override
-  State<Createpage> createState() => _CreatepageState();
+  State<CreatePage> createState() => _CreatepageState();
 }
 
-class _CreatepageState extends State<Createpage> {
+class _CreatepageState extends State<CreatePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _universityController = TextEditingController();
   final TextEditingController _departmentController = TextEditingController();
@@ -282,7 +285,7 @@ class _CreatepageState extends State<Createpage> {
                               Row(
                                 children: [
                                   Expanded(
-                                    flex: 3, // 学部名の比率を少し下げる（3:2の比率）
+                                    flex: 1, // 学部名と学年を同じ比率に変更
                                     child: _buildTextField(
                                       controller: _departmentController,
                                       hintText: '学部名入力',
@@ -290,7 +293,7 @@ class _CreatepageState extends State<Createpage> {
                                   ),
                                   SizedBox(width: paddingSize),
                                   Expanded(
-                                    flex: 2, // 学年の比率を維持
+                                    flex: 1, // 学部名と学年を同じ比率に変更
                                     child: _buildDropdown(
                                       value: _selectedGrade,
                                       hintText: '学年',
@@ -469,10 +472,12 @@ class _CreatepageState extends State<Createpage> {
       value: value,
       isDense: true, // より密なレイアウト
       alignment: Alignment.center, // ドロップダウン全体を中央揃えに
+      dropdownColor: Colors.white, // プルダウンメニューの背景色を白に設定
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
           textBaseline: TextBaseline.alphabetic,
+          color: AppColor.text.primary, // ヒントテキストの色を紫に
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
