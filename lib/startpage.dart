@@ -40,12 +40,12 @@ class Startpage extends StatelessWidget {
                         debugPrint('ボタンが押されました');
                       },
                       child: DottedBorder(
-                        options: RectDottedBorderOptions(
-                          dashPattern: [8, 4],
-                          strokeWidth: 5,
-                          //padding: EdgeInsets.all(16),
-                          color: Color(0xFFF92929),
-                        ),
+                        color: const Color(0xFFF92929), // 線の色
+                        strokeWidth: 5, // 線の太さ
+                        dashPattern: const [8, 4], // 破線パターン（線長, 間隔）
+                        borderType: BorderType.RRect, // 角丸長方形
+                        radius: const Radius.circular(0), // 角の丸み（0なら角丸なし）
+                        // padding: const EdgeInsets.all(16), // 必要なら内側余白
                         child: Container(
                           width: 172,
                           height: 259,
