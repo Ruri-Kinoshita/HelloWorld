@@ -66,6 +66,10 @@ class _CreatepageState extends ConsumerState<CreatePage> {
     final Color accentColor = selectedRole?.color ?? const Color(0xFF7638FA);
     final String roleLabel = selectedRole?.label ?? 'デザイナー';
 
+    // ★ ビギナーなら「なりたい職種」、それ以外は「よく使うツール」
+    final bool isBeginner = selectedRole == UserRole.beginner;
+    final String toolSectionTitle = isBeginner ? 'なりたい職種' : 'よく使うツール';
+
     final screenSize = MediaQuery.of(context).size;
     final screenHeight = screenSize.height;
     final screenWidth = screenSize.width;
@@ -90,7 +94,6 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                     color: AppColor.ui.background,
                     padding: EdgeInsets.symmetric(
                         horizontal: paddingSize, vertical: paddingSize * 0.5),
-                    // padding: EdgeInsets.all(paddingSize),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -128,7 +131,7 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                             ),
                           ],
                         ),
-                        SizedBox(height: screenHeight * 0.01), // より小さく調整
+                        SizedBox(height: screenHeight * 0.01),
 
                         // タイトルテキスト
                         Text(
@@ -139,8 +142,7 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                             color: AppColor.text.primary,
                           ),
                         ),
-                        SizedBox(
-                            height: screenHeight * 0.005), // タイトル間のスペーシングを縮小
+                        SizedBox(height: screenHeight * 0.005),
                         Text(
                           'アイコンとコメントは完成後に生成されます。',
                           style: TextStyle(
@@ -148,7 +150,6 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                             color: AppColor.text.primary,
                           ),
                         ),
-                        // SizedBox(height: screenHeight * 0.0004), // 余白を小さく調整
                       ],
                     ),
                   ),
@@ -158,18 +159,19 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                     child: Container(
                       color: AppColor.ui.background, // グレー背景
                       padding: EdgeInsets.fromLTRB(
-                          paddingSize * 0.5, // 左右に余白
-                          paddingSize * 0.008, // 上余白を小さく（白い部分を上に伸ばす）
-                          paddingSize * 0.5,
-                          paddingSize * 0.2), // 下余白を小さく（白い部分を下に伸ばす）
+                        paddingSize * 0.5,
+                        paddingSize * 0.008,
+                        paddingSize * 0.5,
+                        paddingSize * 0.2,
+                      ),
                       child: Container(
                         color: AppColor.brand.primary, // 白背景
                         child: SingleChildScrollView(
                           padding: EdgeInsets.only(
                             left: paddingSize,
                             right: paddingSize,
-                            top: paddingSize * 0.6, // 上部パディングを少し大きく（中身を調整）
-                            bottom: paddingSize * 1.2, // 下部パディングを大きく（中身を調整）
+                            top: paddingSize * 0.6,
+                            bottom: paddingSize * 1.2,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,7 +195,7 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                                   ),
                                 ),
                               ),
-                              SizedBox(height: screenHeight * 0.015), // より小さく調整
+                              SizedBox(height: screenHeight * 0.015),
 
                               // アイコンとプロフィール入力エリア
                               Row(
@@ -214,20 +216,19 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                                         'アイコン\n生成中...',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          fontSize: screenWidth *
-                                              0.030, // フォントサイズを少し大きく
+                                          fontSize: screenWidth * 0.030,
                                           color: AppColor.text.primary,
                                         ),
                                       ),
                                     ),
                                   ),
-                                  SizedBox(width: paddingSize * 0.8), // 間隔を少し狭く
+                                  SizedBox(width: paddingSize * 0.8),
 
                                   // プロフィール入力エリア
                                   Expanded(
                                     child: Column(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center, // 垂直方向中央揃え
+                                          MainAxisAlignment.center,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
@@ -242,19 +243,17 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                                         SizedBox(height: screenHeight * 0.005),
                                         TextField(
                                           controller: _nameController,
-                                          textAlign:
-                                              TextAlign.center, // 中央揃えを追加
+                                          textAlign: TextAlign.center,
                                           inputFormatters: [
-                                            // ひらがなのみを許可する正規表現パターン
+                                            // ひらがなのみを許可
                                             FilteringTextInputFormatter.allow(
                                               RegExp(r'[あ-ん゛゜ー]'),
                                             ),
                                           ],
                                           style: TextStyle(
-                                            color: accentColor, // 入力テキストをロール色に
+                                            color: accentColor,
                                             fontSize: 14,
-                                            fontWeight:
-                                                FontWeight.bold, // 入力テキストを太字に
+                                            fontWeight: FontWeight.bold,
                                           ),
                                           decoration: InputDecoration(
                                             hintText: 'ひらがななまえ',
@@ -265,8 +264,7 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                                             contentPadding:
                                                 EdgeInsets.symmetric(
                                               horizontal: paddingSize,
-                                              vertical:
-                                                  screenHeight * 0.008, // 縦幅を調整
+                                              vertical: screenHeight * 0.008,
                                             ),
                                             fillColor: AppColor.ui.white,
                                             filled: true,
@@ -291,7 +289,7 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                               Row(
                                 children: [
                                   Expanded(
-                                    flex: 1, // 学部名と学年を同じ比率に変更
+                                    flex: 1,
                                     child: _buildTextField(
                                       controller: _departmentController,
                                       hintText: '学部名入力',
@@ -300,7 +298,7 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                                   ),
                                   SizedBox(width: paddingSize),
                                   Expanded(
-                                    flex: 1, // 学部名と学年を同じ比率に変更
+                                    flex: 1,
                                     child: _buildDropdown(
                                       value: _selectedGrade,
                                       hintText: '学年',
@@ -344,17 +342,17 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: screenHeight * 0.02), // 少し削減
+                              SizedBox(height: screenHeight * 0.02),
 
-                              // よく使うツール
+                              // よく使うツール / なりたい職種（ビギナー）
                               _buildSectionTitleWithEdit(
-                                'よく使うツール',
+                                toolSectionTitle, // ★ 動的に
                                 () => setState(() => _showToolSelector = true),
                                 _selectedTools.isNotEmpty,
                                 accentColor,
                               ),
                               _buildToolButton(accentColor),
-                              SizedBox(height: screenHeight * 0.010), // 少し削減
+                              SizedBox(height: screenHeight * 0.010),
 
                               // 生活
                               _buildSectionTitleWithEdit(
@@ -365,7 +363,7 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                                 accentColor,
                               ),
                               _buildLifestyleButton(accentColor),
-                              SizedBox(height: screenHeight * 0.010), // 少し削減
+                              SizedBox(height: screenHeight * 0.010),
 
                               // ハッカソンに対する思い
                               _buildSectionTitleWithEdit(
@@ -376,8 +374,7 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                                 accentColor,
                               ),
                               _buildHackathonButton(accentColor),
-                              SizedBox(
-                                  height: screenHeight * 0.006), // 最後の余白を半分に削減
+                              SizedBox(height: screenHeight * 0.006),
                             ],
                           ),
                         ),
@@ -387,7 +384,9 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                 ],
               ),
               // オーバーレイ
-              if (_showToolSelector) _buildToolSelectorOverlay(accentColor),
+              if (_showToolSelector)
+                _buildToolSelectorOverlay(
+                    accentColor, toolSectionTitle), // ★ タイトル渡す
               if (_showLifestyleSelector)
                 _buildLifestyleSelectorOverlay(accentColor),
               if (_showHackathonSelector)
@@ -491,9 +490,9 @@ class _CreatepageState extends ConsumerState<CreatePage> {
       dropdownColor: Colors.white, // プルダウンメニューの背景色を白に設定
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(
+        hintStyle: TextStyle(
           textBaseline: TextBaseline.alphabetic,
-          color: AppColor.text.primary, // ヒントテキストの色を紫に
+          color: AppColor.text.primary, // ヒントテキスト色
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -554,12 +553,16 @@ class _CreatepageState extends ConsumerState<CreatePage> {
     final lifestyle = _selectedLifestyle.toList();
     final hackathonThought = _selectedHackathonThought.toList();
 
+    // ★ ロールに応じてラベルを切り替え
+    final role = ref.read(selectedRoleProvider);
+    final toolsLabel = (role == UserRole.beginner) ? 'なりたい職種' : 'よく使うツール';
+
     debugPrint('名前: $name');
     debugPrint('大学名: $university');
     debugPrint('学部名: $department');
     debugPrint('学年: $grade');
     debugPrint('メールアドレス: $email');
-    debugPrint('よく使うツール: $tools');
+    debugPrint('$toolsLabel: $tools'); // ★ ここが動的
     debugPrint('生活: $lifestyle');
     debugPrint('ハッカソンに対する思い: $hackathonThought');
   }
@@ -818,18 +821,10 @@ class _CreatepageState extends ConsumerState<CreatePage> {
     }
   }
 
-  Widget _buildToolSelectorOverlay(Color accentColor) {
-    final availableTools = [
-      'Figma',
-      'Adobe XD',
-      'Canva',
-      'Miro',
-      'Photoshop',
-      'Illustrator',
-      'Sketch',
-      'InVision',
-      'その他'
-    ];
+  // ★ タイトル受け取りに変更（よく使うツール / なりたい職種）
+  Widget _buildToolSelectorOverlay(Color accentColor, String title) {
+    // ロールに応じた候補を取得
+    final availableTools = ref.watch(toolOptionsProvider);
 
     return Positioned(
       bottom: 0,
@@ -853,7 +848,7 @@ class _CreatepageState extends ConsumerState<CreatePage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ハンドル
+            // --- 以降のUIは現状のまま ---
             Container(
               margin: const EdgeInsets.only(top: 8),
               width: 40,
@@ -863,44 +858,31 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-
-            // ヘッダー
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'よく使うツール',
-                    style: TextStyle(
+                  Text(
+                    title, // ★ 動的タイトル
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _showToolSelector = false;
-                      });
-                    },
+                    onPressed: () => setState(() => _showToolSelector = false),
                     icon: const Icon(Icons.close),
                   ),
                 ],
               ),
             ),
-
-            // 選択数の表示
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  Text(
-                    '最大3つ選んでください',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
+                  Text('最大3つ選んでください',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                   const Spacer(),
                   Text(
                     '${_selectedTools.length}/3',
@@ -915,8 +897,6 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                 ],
               ),
             ),
-
-            // チップ選択エリア
             Padding(
               padding: const EdgeInsets.all(16),
               child: Wrap(
@@ -935,13 +915,10 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                     selected: isSelected,
                     selectedColor: accentColor,
                     checkmarkColor: Colors.white,
-                    backgroundColor: Colors.white, // 背景を白に
+                    backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20), // 角をもっと丸く
-                      side: BorderSide(
-                        color: accentColor, // 枠線をロール色に
-                        width: 1,
-                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(color: accentColor, width: 1),
                     ),
                     onSelected: (selected) {
                       setState(() {
@@ -958,32 +935,23 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                 }).toList(),
               ),
             ),
-
-            // 完了ボタン
             Padding(
               padding: const EdgeInsets.all(16),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _showToolSelector = false;
-                    });
-                  },
+                  onPressed: () => setState(() => _showToolSelector = false),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: accentColor,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20), // 角をもっと丸く
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   child: const Text(
                     '完了',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

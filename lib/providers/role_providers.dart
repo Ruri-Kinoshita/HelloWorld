@@ -22,3 +22,38 @@ extension UserRoleX on UserRole {
 
 // 最初は未選択(null)。直接Createを開いたときのフォールバックもCreate側で用意します。
 final selectedRoleProvider = StateProvider<UserRole?>((ref) => null);
+
+final toolOptionsProvider = Provider<List<String>>((ref) {
+  final role = ref.watch(selectedRoleProvider);
+  switch (role) {
+    case UserRole.engineer:
+      return ['Python', 'Flutter', 'Java', 'React', 'Unity'];
+    case UserRole.designer:
+      return [
+        'Figma',
+        'Adobe XD',
+        'Canva',
+        'Miro',
+        'Photoshop',
+        'Illustrator',
+        'Sketch',
+        'InVision',
+      ];
+    case UserRole.pm:
+      return ['Miro', 'Notion', 'Slack', 'Discord', 'Zoom'];
+    case UserRole.beginner:
+      return ['プログラミング', 'デザイナー', 'PM'];
+    case null:
+      // 直接Createを開いた等のフォールバック（デザイナーを既定に）
+      return [
+        'Figma',
+        'Adobe XD',
+        'Canva',
+        'Miro',
+        'Photoshop',
+        'Illustrator',
+        'Sketch',
+        'InVision',
+      ];
+  }
+});
