@@ -1,6 +1,9 @@
+// startpage.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:helloworld/providers/received_images_provider.dart';
 
 class Startpage extends StatelessWidget {
   const Startpage({super.key});
@@ -24,6 +27,7 @@ class Startpage extends StatelessWidget {
           ),
           body: TabBarView(
             children: [
+              // --- つくる ---
               Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: Row(
@@ -32,8 +36,7 @@ class Startpage extends StatelessWidget {
                   children: [
                     InkWell(
                       onTap: () {
-                        // context.push('/photo');
-                        context.push('/camera-off'); // カメラオフページに遷移
+                        context.push('/camera-off');
                         debugPrint('ボタンが押されました');
                       },
                       child: DottedBorder(
@@ -79,54 +82,88 @@ class Startpage extends StatelessWidget {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => Dialog(
-                            child: Image.asset('images/example1.png'),
+
+              // --- もらった（画像を大きく表示・タイトル/日付なし） ---
+              Consumer(
+                builder: (context, ref, _) {
+                  final items = ref.watch(receivedImagesProvider);
+
+                  if (items.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.inbox_outlined, size: 48),
+                          const SizedBox(height: 12),
+                          const Text('まだ受け取った画像はありません'),
+                          const SizedBox(height: 8),
+                          OutlinedButton.icon(
+                            onPressed: () {
+                              context.push('/receive');
+                            },
+                            icon: const Icon(Icons.link),
+                            label: const Text('リンクから受け取る'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  // できるだけ大きく見せる：基本1列グリッド
+                  // （必要なら下のcrossAxisCountを画面幅で2に切替などしてOK）
+                  // final columns = MediaQuery.of(context).size.width >= 700 ? 2 : 1;
+                  const columns = 2;
+
+                  return Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: GridView.builder(
+                      itemCount: items.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: columns,
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
+                        // 作成したカードは縦長想定なので 3/4 を目安に
+                        childAspectRatio: 3 / 4,
+                      ),
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+                        return GestureDetector(
+                          onTap: () {
+                            // タップで個別表示（任意）
+                            context.push(
+                              '/receive?imagename=${Uri.encodeComponent(item.imageName)}',
+                            );
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              color: Colors.white,
+                              child: Image.network(
+                                item.downloadUrl,
+                                fit: BoxFit.contain, // 画像を切り抜かずそのまま大きく
+                                errorBuilder: (_, __, ___) => const Center(
+                                  child: Icon(Icons.broken_image_outlined),
+                                ),
+                                loadingBuilder: (c, child, progress) {
+                                  if (progress == null) return child;
+                                  return const Center(
+                                    child: SizedBox(
+                                      width: 32,
+                                      height: 32,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                         );
                       },
-                      child: Container(
-                        width: 172,
-                        height: 259,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('images/example1.png'),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => Dialog(
-                            child: Image.asset('images/example2.png'),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: 172,
-                        height: 259,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('images/example2.png'),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
             ],
           ),
