@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:helloworld/constant/app_color.dart';
 import 'package:helloworld/providers/profile_provider.dart';
+import 'package:helloworld/providers/role_providers.dart';
 
 class Sharepage extends ConsumerWidget {
   const Sharepage({super.key});
@@ -11,6 +12,17 @@ class Sharepage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Riverpodからプロフィールデータを取得
     final profileData = ref.watch(profileProvider);
+
+    // ★ ロール情報を取得してカラーと文言を設定
+    final selectedRole = ref.watch(selectedRoleProvider);
+    final Color accentColor =
+        selectedRole?.color ?? AppColor.ui.designer; // デフォルトはデザイナー色
+    final String roleLabel = selectedRole?.label ?? 'デザイナー';
+
+    // ★ ビギナーなら「なりたい職種」、それ以外は「よく使うツール」
+    final bool isBeginner = selectedRole == UserRole.beginner;
+    final String toolSectionTitle = isBeginner ? 'なりたい職種' : 'よく使うツール';
+
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
 
@@ -58,7 +70,7 @@ class Sharepage extends ConsumerWidget {
                                   minHeight: 70, // 2行程度に適したサイズに調整
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.purple.withOpacity(0.2),
+                                  color: accentColor.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Center(
@@ -85,7 +97,7 @@ class Sharepage extends ConsumerWidget {
                                         0.24 *
                                         (4.0 / 3.0), // 比例して高さも調整
                                     decoration: BoxDecoration(
-                                      color: Colors.purple.withOpacity(0.2),
+                                      color: accentColor.withOpacity(0.2),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Center(
@@ -108,12 +120,12 @@ class Sharepage extends ConsumerWidget {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'デザイナーの',
+                                          '${roleLabel}の',
                                           style: TextStyle(
                                             fontSize:
                                                 screenWidth * 0.045, // 画面幅の4.5%
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFF7638FA),
+                                            color: accentColor,
                                           ),
                                         ),
                                         Text(
@@ -124,7 +136,7 @@ class Sharepage extends ConsumerWidget {
                                             fontSize: screenWidth *
                                                 0.08, // 画面幅の8%（さらに大きく）
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFF7638FA),
+                                            color: accentColor,
                                           ),
                                         ),
                                       ],
@@ -182,7 +194,7 @@ class Sharepage extends ConsumerWidget {
                                   Row(
                                     children: [
                                       Icon(Icons.email,
-                                          color: Color(0xFF7638FA), size: 16),
+                                          color: accentColor, size: 16),
                                       SizedBox(width: 8),
                                       Text(
                                         profileData.email.isNotEmpty
@@ -200,10 +212,11 @@ class Sharepage extends ConsumerWidget {
 
                               SizedBox(height: 20),
 
-                              // よく使うツール
+                              // よく使うツール / なりたい職種
                               _buildSection(
-                                'よく使うツール',
+                                toolSectionTitle,
                                 profileData.tools,
+                                accentColor,
                               ),
 
                               SizedBox(height: 16),
@@ -212,6 +225,7 @@ class Sharepage extends ConsumerWidget {
                               _buildSection(
                                 '生活',
                                 profileData.lifestyle,
+                                accentColor,
                               ),
 
                               SizedBox(height: 16),
@@ -220,6 +234,7 @@ class Sharepage extends ConsumerWidget {
                               _buildSection(
                                 'ハッカソンに対する思い',
                                 profileData.hackathonThought,
+                                accentColor,
                               ),
 
                               SizedBox(height: 20),
@@ -284,7 +299,7 @@ class Sharepage extends ConsumerWidget {
                                     },
                                     child: Icon(
                                       Icons.copy,
-                                      color: Color(0xFF7638FA),
+                                      color: accentColor,
                                       size: 16,
                                     ),
                                   ),
@@ -308,7 +323,7 @@ class Sharepage extends ConsumerWidget {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: Color(0xFF7638FA),
+                                  color: accentColor,
                                   width: 2,
                                 ),
                               ),
@@ -317,7 +332,7 @@ class Sharepage extends ConsumerWidget {
                                 children: [
                                   Icon(
                                     Icons.download,
-                                    color: Color(0xFF7638FA),
+                                    color: accentColor,
                                     size: 16, // アイコンサイズを小さく
                                   ),
                                   SizedBox(height: 2),
@@ -325,7 +340,7 @@ class Sharepage extends ConsumerWidget {
                                     '画像保存',
                                     style: TextStyle(
                                       fontSize: 6, // 非常に小さいフォントサイズ
-                                      color: Color(0xFF7638FA),
+                                      color: accentColor,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -373,7 +388,7 @@ class Sharepage extends ConsumerWidget {
     );
   }
 
-  Widget _buildSection(String title, List<dynamic> items) {
+  Widget _buildSection(String title, List<dynamic> items, Color accentColor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -396,7 +411,7 @@ class Sharepage extends ConsumerWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Color(0xFF7638FA),
+                  color: accentColor,
                   width: 1,
                 ),
               ),
@@ -404,7 +419,7 @@ class Sharepage extends ConsumerWidget {
                 item.toString(),
                 style: TextStyle(
                   fontSize: 12,
-                  color: Color(0xFF7638FA),
+                  color: accentColor,
                   fontWeight: FontWeight.w500,
                 ),
               ),
