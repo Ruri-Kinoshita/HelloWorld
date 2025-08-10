@@ -31,6 +31,8 @@ class _CreatepageState extends ConsumerState<CreatePage> {
   bool _showToolSelector = false; // ツール選択画面の表示状態
   bool _showLifestyleSelector = false; // 生活選択画面の表示状態
   bool _showHackathonSelector = false; // ハッカソン選択画面の表示状態
+  bool _requestedGenerate = false;
+  bool _startedGen = false;
 
   @override
   void initState() {
@@ -40,6 +42,23 @@ class _CreatepageState extends ConsumerState<CreatePage> {
     _universityController.addListener(() => setState(() {}));
     _departmentController.addListener(() => setState(() {}));
     _emailController.addListener(() => setState(() {}));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _kickoffGenerationOnce();
+    });
+  }
+
+  void _kickoffGenerationOnce() {
+    if (_startedGen) return;
+    _startedGen = true;
+
+    // まだ生成されていなければスタート
+    final generated = ref.read(generatedIconProvider);
+    final isGen = ref.read(isGeneratingProvider);
+    final captured = ref.read(capturedPhotoProvider);
+
+    if (generated == null && !isGen && captured != null) {
+      _generateIcon();
+    }
   }
 
   @override
@@ -65,7 +84,14 @@ class _CreatepageState extends ConsumerState<CreatePage> {
   }
 
   Future<void> _generateIcon() async {
-    final captured = ref.read(capturedPhotoProvider);
+    debugPrint('アイコン生成リクエスト');
+    if (ref.read(isGeneratingProvider)) return;
+    final captured = ref.watch(capturedPhotoProvider);
+    if (captured != null) {
+      captured.length().then((len) {
+        debugPrint('撮影ファイル: ${captured.path} / ${len} bytes');
+      });
+    }
     if (captured == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('先に写真を撮影してください')),
@@ -77,17 +103,13 @@ class _CreatepageState extends ConsumerState<CreatePage> {
       ref.read(genStatusProvider.notifier).state = '画像を生成中...';
 
       final bytes = await captured.readAsBytes();
-      final small = downscaleJpeg(bytes); // 転送量削減
-
-      final png = await generatePixelIcon(jpegBytes: small);
+      final small = downscaleJpeg(bytes); // 転送量削減（元の実装のまま）
+      final png = await generatePixelIcon(jpegBytes: small); // Functions呼び出し
 
       ref.read(generatedIconProvider.notifier).state = png;
       ref.read(genStatusProvider.notifier).state = '生成完了！';
-    } on FirebaseFunctionsException catch (e) {
-      ref.read(genStatusProvider.notifier).state =
-          'Functionsエラー: ${e.code} ${e.message ?? ""}'.trim();
     } catch (e) {
-      ref.read(genStatusProvider.notifier).state = '想定外のエラー: $e';
+      ref.read(genStatusProvider.notifier).state = '生成に失敗しました: $e';
     } finally {
       ref.read(isGeneratingProvider.notifier).state = false;
     }
@@ -104,7 +126,7 @@ class _CreatepageState extends ConsumerState<CreatePage> {
     final iconWidth = screenWidth * 0.24; // アイコンの幅を少し大きく
     final iconHeight = iconWidth * (4.0 / 3.0); // 縦4：横3の比率
     final paddingSize = screenWidth * 0.08; // 画面幅に応じたパディング
-    
+
     final generated = ref.watch(generatedIconProvider);
     final isGen = ref.watch(isGeneratingProvider);
     final genStatus = ref.watch(genStatusProvider);
@@ -139,9 +161,10 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                                     }
                                   : null, // 全ての項目が完了していない場合は無効
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: _isAllFieldsCompleted(generated)
-                                    ? Color(0xFF333333) // 完了時は#333333
-                                    : AppColor.text.gray, // 未完了時はグレー
+                                backgroundColor:
+                                    _isAllFieldsCompleted(generated)
+                                        ? Color(0xFF333333) // 完了時は#333333
+                                        : AppColor.text.gray, // 未完了時はグレー
                                 foregroundColor: AppColor.text.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -241,21 +264,59 @@ class _CreatepageState extends ConsumerState<CreatePage> {
                                       color: Colors.purple.withOpacity(0.2),
                                       borderRadius: BorderRadius.circular(
                                           UiSize.minimumGridCircular),
-                                          border: Border.all(color: Colors.purple.withOpacity(0.15)),
+                                      border: Border.all(
+                                          color:
+                                              Colors.purple.withOpacity(0.15)),
                                     ),
                                     child: Center(
                                       child: generated == null
-                                          ? Text(
-                                              isGen ? '生成中...' : '未生成',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: screenWidth * 0.030,
-                                                color: AppColor.text.primary,
-                                              ),
-                                            )
+                                          ? (isGen
+                                              ? Text('生成中...',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          screenWidth * 0.030,
+                                                      color: AppColor
+                                                          .text.primary))
+                                              : Stack(
+                                                  children: [
+                                                    Positioned.fill(
+                                                      child: generated == null
+                                                          ? Center(
+                                                              child: Text(
+                                                              isGen
+                                                                  ? '生成中...'
+                                                                  : '未生成',
+                                                            ))
+                                                          : ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          UiSize
+                                                                              .minimumGridCircular),
+                                                              child: Image.memory(
+                                                                  generated,
+                                                                  fit: BoxFit
+                                                                      .contain),
+                                                            ),
+                                                    ),
+                                                    if (isGen)
+                                                      const Positioned.fill(
+                                                        child: Center(
+                                                            child:
+                                                                CircularProgressIndicator()),
+                                                      ),
+                                                  ],
+                                                ))
                                           : ClipRRect(
-                                              borderRadius: BorderRadius.circular(UiSize.minimumGridCircular),
-                                              child: Image.memory(generated, fit: BoxFit.contain),
+                                              borderRadius:
+                                                  BorderRadius.circular(UiSize
+                                                      .minimumGridCircular),
+                                              child: Image.memory(
+                                                generated,
+                                                fit: BoxFit.contain,
+                                                gaplessPlayback: true,
+                                              ),
                                             ),
                                     ),
                                   ),

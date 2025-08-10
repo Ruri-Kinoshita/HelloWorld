@@ -72,7 +72,7 @@ class SelectRolePage extends StatelessWidget {
             const SizedBox(height: 10), // 見出しと最初のボタンの間のスペース
 
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {context.push('/create'); },
               child: Text(
                 'エンジニア',
                 style: TextStyle(color: AppColor.ui.engineer, fontSize: 18),
@@ -82,7 +82,7 @@ class SelectRolePage extends StatelessWidget {
             const SizedBox(height: 7), // ボタン間のスペース
 
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {context.push('/create'); },
               child: Text(
                 'デザイナー',
                 style: TextStyle(color: AppColor.ui.designer, fontSize: 18),
@@ -92,7 +92,7 @@ class SelectRolePage extends StatelessWidget {
             const SizedBox(height: 7), // ボタン間のスペース
 
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {context.push('/create');},
               child: Text(
                 'PM',
                 style: TextStyle(color: AppColor.ui.pm, fontSize: 18),
@@ -102,7 +102,7 @@ class SelectRolePage extends StatelessWidget {
             const SizedBox(height: 7), // ボタン間のスペース
 
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () { context.push('/create');},
               child: Text(
                 'ビギナー（初心者）',
                 style: TextStyle(color: AppColor.ui.beginner, fontSize: 18),

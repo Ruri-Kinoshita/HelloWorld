@@ -72,8 +72,15 @@ class _PhotoPageState extends ConsumerState<PhotoPage> {
       // 撮った写真を Riverpod に保持
       ref.read(capturedPhotoProvider.notifier).state = image;
 
+      // 生成結果をクリア＆フラグ初期化（←ここがポイント）
+      ref.read(generatedIconProvider.notifier).state = null;
+      ref.read(isGeneratingProvider.notifier).state = false;
+      ref.read(genStatusProvider.notifier).state = '';
+
+      debugPrint('写真撮影完了');
+
       if (!mounted) return;
-      context.push('/create'); // 遷移先はルート定義に合わせて
+      context.push('/role'); // プロフィールへ
     } catch (e) {
       debugPrint('撮影失敗: $e');
       if (!mounted) return;
