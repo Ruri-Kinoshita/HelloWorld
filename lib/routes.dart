@@ -59,18 +59,15 @@ final goRouter = GoRouter(
       pageBuilder: (context, state) {
         return MaterialPage(
           key: state.pageKey,
-          child: const Sharepage(),
+          child: Sharepage(),
         );
       },
     ),
     GoRoute(
       path: '/receive',
-      name: 'receivepage',
-      pageBuilder: (context, state) {
-        return MaterialPage(
-          key: state.pageKey,
-          child: const ReceivePage(),
-        );
+      builder: (context, state) {
+        final imageName = state.uri.queryParameters['imagename'];
+        return ReceivePage(imageName: imageName);
       },
     ),
     GoRoute(
