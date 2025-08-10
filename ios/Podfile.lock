@@ -5,15 +5,33 @@ PODS:
     - Flutter
   - Firebase/CoreOnly (12.0.0):
     - FirebaseCore (~> 12.0.0)
+  - Firebase/Storage (12.0.0):
+    - Firebase/CoreOnly
+    - FirebaseStorage (~> 12.0.0)
   - firebase_core (4.0.0):
     - Firebase/CoreOnly (= 12.0.0)
     - Flutter
+  - firebase_storage (13.0.0):
+    - Firebase/Storage (= 12.0.0)
+    - firebase_core
+    - Flutter
+  - FirebaseAppCheckInterop (12.0.0)
+  - FirebaseAuthInterop (12.0.0)
   - FirebaseCore (12.0.0):
     - FirebaseCoreInternal (~> 12.0.0)
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/Logger (~> 8.1)
+  - FirebaseCoreExtension (12.0.0):
+    - FirebaseCore (~> 12.0.0)
   - FirebaseCoreInternal (12.0.0):
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
+  - FirebaseStorage (12.0.0):
+    - FirebaseAppCheckInterop (~> 12.0.0)
+    - FirebaseAuthInterop (~> 12.0.0)
+    - FirebaseCore (~> 12.0.0)
+    - FirebaseCoreExtension (~> 12.0.0)
+    - GoogleUtilities/Environment (~> 8.1)
+    - GTMSessionFetcher/Core (< 6.0, >= 3.4)
   - Flutter (1.0.0)
   - GoogleUtilities/Environment (8.1.0):
     - GoogleUtilities/Privacy
@@ -23,6 +41,7 @@ PODS:
   - "GoogleUtilities/NSData+zlib (8.1.0)":
     - GoogleUtilities/Privacy
   - GoogleUtilities/Privacy (8.1.0)
+  - GTMSessionFetcher/Core (5.0.0)
   - image_picker_ios (0.0.1):
     - Flutter
 
@@ -30,15 +49,21 @@ DEPENDENCIES:
   - app_links (from `.symlinks/plugins/app_links/ios`)
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
+  - firebase_storage (from `.symlinks/plugins/firebase_storage/ios`)
   - Flutter (from `Flutter`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
 
 SPEC REPOS:
   trunk:
     - Firebase
+    - FirebaseAppCheckInterop
+    - FirebaseAuthInterop
     - FirebaseCore
+    - FirebaseCoreExtension
     - FirebaseCoreInternal
+    - FirebaseStorage
     - GoogleUtilities
+    - GTMSessionFetcher
 
 EXTERNAL SOURCES:
   app_links:
@@ -47,6 +72,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/camera_avfoundation/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
+  firebase_storage:
+    :path: ".symlinks/plugins/firebase_storage/ios"
   Flutter:
     :path: Flutter
   image_picker_ios:
@@ -57,10 +84,16 @@ SPEC CHECKSUMS:
   camera_avfoundation: adb0207d868b2d873e895371d88448399ab78d87
   Firebase: 800d487043c0557d9faed71477a38d9aafb08a41
   firebase_core: c70f903d70ec229c08c2f49aba5a8c1338546d40
+  firebase_storage: 65077495e570982849953539c848be97ac568863
+  FirebaseAppCheckInterop: c848d06a04030c9858ef0ae555b82035dbe470d0
+  FirebaseAuthInterop: 002da671896af5e8879ae117dc604ed240b86e80
   FirebaseCore: 055f4ab117d5964158c833f3d5e7ec6d91648d4a
+  FirebaseCoreExtension: 639afb3de6abd611952be78a794c54a47fa0f361
   FirebaseCoreInternal: dedc28e569a4be85f38f3d6af1070a2e12018d55
+  FirebaseStorage: 5603c913805b0eacc8e6853395e837ca5742e5f7
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
+  GTMSessionFetcher: 02d6e866e90bc236f48a703a041dfe43e6221a29
   image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
 
 PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796

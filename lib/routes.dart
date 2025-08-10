@@ -29,7 +29,7 @@ final goRouter = GoRouter(
       pageBuilder: (context, state) {
         return MaterialPage(
           key: state.pageKey,
-          child: const photoPage(),
+          child: const PhotoPage(),
         );
       },
     ),
@@ -49,7 +49,7 @@ final goRouter = GoRouter(
       pageBuilder: (context, state) {
         return MaterialPage(
           key: state.pageKey,
-          child: const Createpage(),
+          child: const CreatePage(),
         );
       },
     ),
