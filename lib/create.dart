@@ -1,20 +1,25 @@
 // create.dart
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:helloworld/ai_service.dart';
 import 'package:helloworld/constant/app_color.dart';
 import 'package:helloworld/constant/app_size.dart';
 
-class CreatePage extends StatefulWidget {
+import 'dart:typed_data';
+import 'package:cloud_functions/cloud_functions.dart';
+
+import 'package:helloworld/providers/photo_providers.dart';
+
+class CreatePage extends ConsumerStatefulWidget {
   const CreatePage({super.key});
 
   @override
-  State<CreatePage> createState() => _CreatepageState();
+  ConsumerState<CreatePage> createState() => _CreatepageState();
 }
 
-class _CreatepageState extends State<CreatePage> {
+class _CreatepageState extends ConsumerState<CreatePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _universityController = TextEditingController();
   final TextEditingController _departmentController = TextEditingController();
@@ -47,7 +52,7 @@ class _CreatepageState extends State<CreatePage> {
   }
 
   // 全ての項目が入力されているかチェック
-  bool _isAllFieldsCompleted() {
+  bool _isAllFieldsCompleted(Uint8List? generated) {
     return _nameController.text.isNotEmpty &&
         _universityController.text.isNotEmpty &&
         _departmentController.text.isNotEmpty &&
@@ -55,7 +60,37 @@ class _CreatepageState extends State<CreatePage> {
         _emailController.text.isNotEmpty &&
         _selectedTools.isNotEmpty &&
         _selectedLifestyle.isNotEmpty &&
-        _selectedHackathonThought.isNotEmpty;
+        _selectedHackathonThought.isNotEmpty &&
+        generated != null;
+  }
+
+  Future<void> _generateIcon() async {
+    final captured = ref.read(capturedPhotoProvider);
+    if (captured == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('先に写真を撮影してください')),
+      );
+      return;
+    }
+    try {
+      ref.read(isGeneratingProvider.notifier).state = true;
+      ref.read(genStatusProvider.notifier).state = '画像を生成中...';
+
+      final bytes = await captured.readAsBytes();
+      final small = downscaleJpeg(bytes); // 転送量削減
+
+      final png = await generatePixelIcon(jpegBytes: small);
+
+      ref.read(generatedIconProvider.notifier).state = png;
+      ref.read(genStatusProvider.notifier).state = '生成完了！';
+    } on FirebaseFunctionsException catch (e) {
+      ref.read(genStatusProvider.notifier).state =
+          'Functionsエラー: ${e.code} ${e.message ?? ""}'.trim();
+    } catch (e) {
+      ref.read(genStatusProvider.notifier).state = '想定外のエラー: $e';
+    } finally {
+      ref.read(isGeneratingProvider.notifier).state = false;
+    }
   }
 
   @override
@@ -69,6 +104,10 @@ class _CreatepageState extends State<CreatePage> {
     final iconWidth = screenWidth * 0.24; // アイコンの幅を少し大きく
     final iconHeight = iconWidth * (4.0 / 3.0); // 縦4：横3の比率
     final paddingSize = screenWidth * 0.08; // 画面幅に応じたパディング
+    
+    final generated = ref.watch(generatedIconProvider);
+    final isGen = ref.watch(isGeneratingProvider);
+    final genStatus = ref.watch(genStatusProvider);
 
     return MaterialApp(
       home: Scaffold(
@@ -93,14 +132,14 @@ class _CreatepageState extends State<CreatePage> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             ElevatedButton(
-                              onPressed: _isAllFieldsCompleted()
+                              onPressed: _isAllFieldsCompleted(generated)
                                   ? () {
                                       _handleSubmit();
                                       context.push('/share');
                                     }
                                   : null, // 全ての項目が完了していない場合は無効
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: _isAllFieldsCompleted()
+                                backgroundColor: _isAllFieldsCompleted(generated)
                                     ? Color(0xFF333333) // 完了時は#333333
                                     : AppColor.text.gray, // 未完了時はグレー
                                 foregroundColor: AppColor.text.white,
@@ -202,17 +241,22 @@ class _CreatepageState extends State<CreatePage> {
                                       color: Colors.purple.withOpacity(0.2),
                                       borderRadius: BorderRadius.circular(
                                           UiSize.minimumGridCircular),
+                                          border: Border.all(color: Colors.purple.withOpacity(0.15)),
                                     ),
                                     child: Center(
-                                      child: Text(
-                                        'アイコン\n生成中...',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: screenWidth *
-                                              0.030, // フォントサイズを少し大きく
-                                          color: AppColor.text.primary,
-                                        ),
-                                      ),
+                                      child: generated == null
+                                          ? Text(
+                                              isGen ? '生成中...' : '未生成',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: screenWidth * 0.030,
+                                                color: AppColor.text.primary,
+                                              ),
+                                            )
+                                          : ClipRRect(
+                                              borderRadius: BorderRadius.circular(UiSize.minimumGridCircular),
+                                              child: Image.memory(generated, fit: BoxFit.contain),
+                                            ),
                                     ),
                                   ),
                                   SizedBox(width: paddingSize * 0.8), // 間隔を少し狭く
