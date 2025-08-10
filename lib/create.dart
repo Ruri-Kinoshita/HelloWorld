@@ -92,8 +92,23 @@ class _CreatepageState extends State<Createpage> {
                             ElevatedButton(
                               onPressed: _isAllFieldsCompleted()
                                   ? () {
+                                      final profileData = {
+                                        'name': _nameController.text,
+                                        'university':
+                                            _universityController.text,
+                                        'department':
+                                            _departmentController.text,
+                                        'grade': _selectedGrade,
+                                        'email': _emailController.text,
+                                        'tools': _selectedTools.toList(),
+                                        'lifestyle':
+                                            _selectedLifestyle.toList(),
+                                        'hackathonThought':
+                                            _selectedHackathonThought.toList(),
+                                      };
                                       _handleSubmit();
-                                      context.push('/share');
+                                      context.push('/share',
+                                          extra: profileData);
                                     }
                                   : null, // 全ての項目が完了していない場合は無効
                               style: ElevatedButton.styleFrom(
@@ -154,7 +169,7 @@ class _CreatepageState extends State<Createpage> {
                           paddingSize * 0.5,
                           paddingSize * 0.2), // 下余白を小さく（白い部分を下に伸ばす）
                       child: Container(
-                        color: AppColor.brand.primary, // 白背景
+                        color: AppColor.ui.white, // 白背景
                         child: SingleChildScrollView(
                           padding: EdgeInsets.only(
                             left: paddingSize,
@@ -524,23 +539,25 @@ class _CreatepageState extends State<Createpage> {
   }
 
   void _handleSubmit() {
-    final name = _nameController.text;
-    final university = _universityController.text;
-    final department = _departmentController.text;
-    final grade = _selectedGrade;
-    final email = _emailController.text;
-    final tools = _selectedTools.toList();
-    final lifestyle = _selectedLifestyle.toList();
-    final hackathonThought = _selectedHackathonThought.toList();
+    final profileData = {
+      'name': _nameController.text,
+      'university': _universityController.text,
+      'department': _departmentController.text,
+      'grade': _selectedGrade,
+      'email': _emailController.text,
+      'tools': _selectedTools.toList(),
+      'lifestyle': _selectedLifestyle.toList(),
+      'hackathonThought': _selectedHackathonThought.toList(),
+    };
 
-    debugPrint('名前: $name');
-    debugPrint('大学名: $university');
-    debugPrint('学部名: $department');
-    debugPrint('学年: $grade');
-    debugPrint('メールアドレス: $email');
-    debugPrint('よく使うツール: $tools');
-    debugPrint('生活: $lifestyle');
-    debugPrint('ハッカソンに対する思い: $hackathonThought');
+    debugPrint('名前: ${profileData['name']}');
+    debugPrint('大学名: ${profileData['university']}');
+    debugPrint('学部名: ${profileData['department']}');
+    debugPrint('学年: ${profileData['grade']}');
+    debugPrint('メールアドレス: ${profileData['email']}');
+    debugPrint('よく使うツール: ${profileData['tools']}');
+    debugPrint('生活: ${profileData['lifestyle']}');
+    debugPrint('ハッカソンに対する思い: ${profileData['hackathonThought']}');
   }
 
   Widget _buildToolButton() {
