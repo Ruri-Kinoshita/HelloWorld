@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dotted_border/dotted_border.dart';
 
 class Startpage extends StatelessWidget {
   const Startpage({super.key});
@@ -35,25 +36,25 @@ class Startpage extends StatelessWidget {
                         context.push('/camera-off'); // カメラオフページに遷移
                         debugPrint('ボタンが押されました');
                       },
-                      child: Container(
+                      child: DottedBorder(
+                        options: RectDottedBorderOptions(
+                          dashPattern: [8, 4],
+                          strokeWidth: 5,
+                          //padding: EdgeInsets.all(16),
+                          color: Color(0xFFF92929),
+                        ),
+                        child: Container(
                           width: 172,
                           height: 259,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                              color: Color(0xFFF92929),
-                              width: 5.0,
-                            ),
-                            borderRadius: BorderRadius.circular(0),
+                          color: Colors.white,
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.add,
+                            size: 100,
+                            color: Color(0xFFF92929),
                           ),
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.add,
-                              size: 100,
-                              color: Color(0xFFF92929),
-                            ),
-                          )),
+                        ),
+                      ),
                     ),
                     Container(
                       width: 172,
@@ -68,37 +69,49 @@ class Startpage extends StatelessWidget {
                   ],
                 ),
               ),
-              /* ElevatedButton(
-                onPressed: () {
-                  context.push('/photo');
-                  //context.push('/camera-off'); // カメラオフページに遷移
-                  debugPrint('ボタンが押されました');
-                },
-                child: const Text('押してね'),
-              ),*/
               Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 172,
-                      height: 259,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('images/example1.png'),
-                          fit: BoxFit.cover,
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => Dialog(
+                            child: Image.asset('images/example1.png'),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 172,
+                        height: 259,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('images/example1.png'),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
-                    Container(
-                      width: 172,
-                      height: 259,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('images/example2.png'),
-                          fit: BoxFit.cover,
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => Dialog(
+                            child: Image.asset('images/example2.png'),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 172,
+                        height: 259,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('images/example2.png'),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
