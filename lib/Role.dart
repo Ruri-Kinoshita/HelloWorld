@@ -1,60 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:helloworld/constant/app_color.dart';
+import 'package:helloworld/providers/role_providers.dart';
 
-class SelectRolePage extends StatelessWidget {
+class SelectRolePage extends ConsumerWidget {
   const SelectRolePage({super.key});
-/*
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // 中央寄せ
-            children: [
-              const Text(
-                '役職選ぶページ', //4つの選択肢から選ぶ
-                style: TextStyle(
-                  fontSize: 24, // 文字サイズ
-                  fontWeight: FontWeight.bold, // 太字
-                ),
-              ),
-              const SizedBox(height: 20), // 文字とボタンの間隔
-              ElevatedButton(
-                onPressed: () {
-                  context.push('/create');
-                  debugPrint('ボタンが押されました');
-                },
-                child: const Text('押してね'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-  */
-  @override
-  Widget build(BuildContext context) {
-    // 画面の幅を取得して、レスポンシブな余白を計算
-    final screenWidth = MediaQuery.of(context).size.width;
-    final horizontalPadding = screenWidth * 0.05; // 左右に5%ずつの余白
 
-    // 全てのボタンに共通のスタイルを定義
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 画面幅から左右余白を計算
+    final screenWidth = MediaQuery.of(context).size.width;
+    final horizontalPadding = screenWidth * 0.05;
+
     final ButtonStyle baseButtonStyle = ElevatedButton.styleFrom(
-      minimumSize: const Size(double.infinity, 53), // 幅を最大にし、高さを53に設定
-      backgroundColor: Color(0xFFFFFFFF),
+      minimumSize: const Size(double.infinity, 53),
+      backgroundColor: const Color(0xFFFFFFFF),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
       ),
-      // ボタンを押した時の波紋効果を無効化したい場合
-      // splashFactory: NoSplash.splashFactory,
-      // 影を調整したい場合
-      //elevation: 2,
-      alignment: Alignment.centerLeft, // 中の要素を左揃えにする
-      padding: const EdgeInsets.symmetric(horizontal: 20.0), // 左右に20pxの内側余白を追加
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
     );
+
+    void choose(UserRole role) {
+      ref.read(selectedRoleProvider.notifier).state = role;
+      // ロール選択後に入力画面へ
+      context.push('/create');
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white.withOpacity(0.0),
@@ -63,53 +37,49 @@ class SelectRolePage extends StatelessWidget {
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // テキストを左寄せにする
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const Text(
               '当てはまるものを選んでください',
               style: TextStyle(color: Color(0xFF333333), fontSize: 13),
             ),
-            const SizedBox(height: 10), // 見出しと最初のボタンの間のスペース
-
+            const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () => choose(UserRole.engineer),
+              style: baseButtonStyle,
               child: Text(
                 'エンジニア',
                 style: TextStyle(color: AppColor.ui.engineer, fontSize: 18),
               ),
-              style: baseButtonStyle,
             ),
-            const SizedBox(height: 7), // ボタン間のスペース
-
+            const SizedBox(height: 7),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () => choose(UserRole.designer),
+              style: baseButtonStyle,
               child: Text(
                 'デザイナー',
                 style: TextStyle(color: AppColor.ui.designer, fontSize: 18),
               ),
-              style: baseButtonStyle,
             ),
-            const SizedBox(height: 7), // ボタン間のスペース
-
+            const SizedBox(height: 7),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () => choose(UserRole.pm),
+              style: baseButtonStyle,
               child: Text(
                 'PM',
                 style: TextStyle(color: AppColor.ui.pm, fontSize: 18),
               ),
-              style: baseButtonStyle,
             ),
-            const SizedBox(height: 7), // ボタン間のスペース
-
+            const SizedBox(height: 7),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () => choose(UserRole.beginner),
+              style: baseButtonStyle,
               child: Text(
                 'ビギナー（初心者）',
                 style: TextStyle(color: AppColor.ui.beginner, fontSize: 18),
               ),
-              style: baseButtonStyle,
             ),
-            const SizedBox(height: 7), // ボタン間のスペース
+            const SizedBox(height: 7),
           ],
         ),
       ),

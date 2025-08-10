@@ -90,8 +90,8 @@ class Startpage extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // context.push('/photo');
-                  context.push('/camera-off'); // カメラオフページに遷移
+                  context.push('/photo');
+                  //context.push('/camera-off'); // カメラオフページに遷移
                   debugPrint('ボタンが押されました');
                 },
                 child: const Text('押してね'),
