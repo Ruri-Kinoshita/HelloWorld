@@ -56,13 +56,23 @@ class Startpage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Container(
-                      width: 172,
-                      height: 259,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('images/example1.png'),
-                          fit: BoxFit.cover,
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => Dialog(
+                            child: Image.asset('images/example1.png'),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 172,
+                        height: 259,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('images/example1.png'),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
